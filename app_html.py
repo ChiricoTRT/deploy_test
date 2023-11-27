@@ -7,7 +7,8 @@ import pandas as pd
 
 # incorporate data into app
 # df = px.data.medals_long()
-df = pd.read_csv('C:\\Users\\chirico\\Documents\\dash_test\\test_data_2.csv')
+# df = pd.read_csv('C:\\Users\\chirico\\Documents\\dash_test\\test_data_2.csv')
+df = pd.read_csv('https://raw.githubusercontent.com/ChiricoTRT/deploy_test/main/test_data_2.csv')
 
 all_options = {
     'impact_01_accessibility': ['Walking', 'Walking and cycling', 'Private car only'],
@@ -41,7 +42,7 @@ app.layout = html.Div(children=[
         'color': '#7FDBFF'
     }),
     html.Div(children=[
-        html.Img(src=r'assets/civitas-muse-logo-whitepng.png', alt='caption', width=100)
+        html.Img(src=r'assets/civitas-muse-logo-whitepng.png', alt='caption', width=200)
     ], style={'textAlign': 'center'}),
     html.Br(),
     mygraph,
@@ -60,15 +61,19 @@ app.layout = html.Div(children=[
         html.Div(children=[
             html.H2('Right hand side'),
             html.Br(),
-            dbc.Row(dcc.Markdown('## Cost of the policy:')),
+            html.H3('Cost of the policy:'),
             dbc.Row(dbc.Col([cost_input], width=6)),
-            dbc.Row(id='cost-output')
+            dbc.Row(id='cost-output'),
+            html.Br(),
+            html.Button("Download dataset", id='btn-download-csv'),
+            dcc.Download(id='download-dataframe-csv')
         ], style={'padding': 10, 'flex': 1})
     ], style={'display': 'flex', 'flexDirection': 'row'})
 ])
 
 
 # Callback allows components to interact
+# CALLBACK TO CHOOSE THE TYPE OF THE GRAPH
 @app.callback(
     Output(mygraph, component_property='figure'),
     Input(dropdown, component_property='value')
@@ -84,17 +89,19 @@ def update_graph(user_input):  # function arguments come from the component prop
     return fig  # returned objects are assigned to the component property of the Output
 
 
+# CALLBACK TO CHOOSE THE IMPACTS (FIRST LEVEL MENU)
 @app.callback(
     Output('level-radio_L2', 'options'),
     Input('indicators-radio_L1', 'value'))
-def set_cities_options(selected_level):
+def set_impacts_options(selected_level):
     return [{'label': i, 'value': i} for i in all_options[selected_level]]
 
 
+# CALLBACK TO SET THE INDICATOR (SECOND LEVEL MENU)
 @app.callback(
     Output('level-radio_L2', 'value'),
     Input('level-radio_L2', 'options'))
-def set_cities_value(available_options):
+def set_indicator(available_options):
     return available_options[0]['value']
 
 
@@ -112,6 +119,15 @@ def set_display_children(selected_level, selected_city):
 )
 def update_output_cost(input_value):
     return f'Final cost: {input_value*2}'
+
+
+@app.callback(
+    Output("download-dataframe-csv", "data"),
+    Input("btn-download-csv", "n_clicks"),
+    prevent_initial_call=True
+)
+def func(n_clicks):
+    return dcc.send_data_frame(df.to_csv, "my_df.csv")
 
 
 # Run app
