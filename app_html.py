@@ -3,6 +3,8 @@ import dash_bootstrap_components as dbc    # pip install dash-bootstrap-componen
 import plotly.express as px
 import pandas as pd
 
+# https://www.youtube.com/watch?v=WOWVat5BgM4&ab_channel=CharmingData
+
 # incorporate data into app
 # df = px.data.medals_long()
 df = pd.read_csv('C:\\Users\\chirico\\Documents\\dash_test\\test_data_2.csv')
