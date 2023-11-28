@@ -15,7 +15,8 @@ all_options = {
 }
 
 colors = {'light_blue': '#02ACE3',
-          'dark_blue': '#0047A0'
+          'dark_blue': '#0047A0',
+          'green': '#8DC650'
           }
 
 # Build your components
@@ -32,50 +33,96 @@ dropdown_graph_co2_ttw_type = dcc.Dropdown(options=['Bar Plot', 'Scatter Plot', 
                                            value='Bar Plot',
                                            clearable=False)
 
+radio_tr_sys_index1_method = dcc.RadioItems(options=['Method 1', 'Method 2', 'Method 3'],
+                                            value='Method 1',
+                                            id='radio-tr-sys-index1')
+
 dropdown_city = dcc.Dropdown(options=['Brussels', 'Madrid'],
                              value='Brussels',
                              clearable=False
                              )
+
 double_filter = dcc.RadioItems(list(all_options.keys()),
                                'impact_01_accessibility',
                                id='indicators-radio_L1'
                                )
 cost_input = dcc.Input(id='cost-input', value='', type='number')
 
-# Layout - HTML
-app.layout = html.Div(children=[
-    # title
+header = html.Div(children=[
+    # header
     html.H1(
         children='Test with Dash',
-        style={
-            'textAlign': 'center',
-            'color': colors['light_blue']
-        }
+        style={'textAlign': 'center', 'color': colors['light_blue']}
     ),
-
     # subtitle
     html.Div(children='Subtitle', style={
         'textAlign': 'center',
         'color': colors['dark_blue']
     }),
-
     # logo
     html.Div(children=[
         html.Img(src=r'assets/civitas-muse-logo-whitepng.png', alt='caption', width=200)
-    ], style={'textAlign': 'center'}),
+    ], style={'textAlign': 'center'})
+]
+)
+
+# Layout - HTML
+app.layout = html.Div(children=[
+    header,
     html.Br(),
 
-    # dropdown for the city selection
-    html.Div(children=[dropdown_city], style={'textAlign': 'center', 'width': '30%', 'margin': 'auto'}),
-    html.Br(),
+    # transport system
+    html.Div(children=[
+        html.H2(children='Transport system',
+                style={
+                    'textAlign': 'center',
+                    'color': colors['light_blue']
+                })
+    ]),
     html.Div([
         html.Div(children=[
-            html.H2('CO2 reduction', style={'textAlign': 'center', 'color': colors['light_blue']}),
+            html.H2('Index 1', style={'textAlign': 'center', 'color': colors['dark_blue']}),
+            radio_tr_sys_index1_method,
+            html.Br(),
+            html.Div(
+                [
+                    html.I(
+                        "Please type the inputs."),
+                    html.Br(),
+                    dcc.Input(id="input1", type="number", placeholder="input 1", style={'marginRight': '10px'}),
+                    dcc.Input(id="input2", type="number", placeholder="input 2", debounce=False),
+                    html.Div(id="output"),
+                ]
+            ),
+        ], style={'padding': 10, 'flex': 1}),
+        html.Div(children=[
+            html.H2('Index 2', style={'textAlign': 'center', 'color': colors['dark_blue']}),
+        ], style={'padding': 10, 'flex': 1}),
+        html.Div(children=[
+            html.H2('Index 3', style={'textAlign': 'center', 'color': colors['dark_blue']}),
+        ], style={'padding': 10, 'flex': 1})
+    ], style={'display': 'flex', 'flexDirection': 'row'}),
+
+    # -----------------------------------------------------------------------------------
+    # -----------------------------------------------------------------------------------
+    # -----------------------------------------------------------------------------------
+
+    # dropdown for the city selection
+    html.Br(),
+    html.Hr(),
+    html.Br(),
+    html.Div(children=[dropdown_city], style={'textAlign': 'center', 'width': '30%', 'margin': 'auto'}),
+    html.Br(),
+
+    # two graphs
+    html.Div([
+        html.Div(children=[
+            html.H2('CO2 reduction', style={'textAlign': 'center', 'color': colors['green']}),
             graph_co2_red,
             dropdown_graph_co2_type
         ], style={'padding': 10, 'flex': 1}),
         html.Div(children=[
-            html.H2('CO2 emissions (thank-to-wheel)', style={'textAlign': 'center', 'color': colors['light_blue']}),
+            html.H2('CO2 emissions (thank-to-wheel)', style={'textAlign': 'center', 'color': colors['green']}),
             graph_co2_ttw,
             dropdown_graph_co2_ttw_type
         ], style={'padding': 10, 'flex': 1})
@@ -105,8 +152,25 @@ app.layout = html.Div(children=[
     ], style={'display': 'flex', 'flexDirection': 'row'})
 ])
 
+inputs = [Input("input1", "value"), Input("input2", "value")]
+
 
 # Callback allows components to interact
+# CALLBACK FOR INDEX 1 OF TRANSPORT SYSTEM, METHOD 1
+@app.callback(
+    Output("output", "children"),
+    inputs,
+    # Input("input1", "value"),
+    # Input("input2", "value"),
+)
+def update_output(input1, input2):
+    if input1 is not None and input2 is not None:
+        score = input1 * input2
+    else:
+        score = ""
+    return f'Score: {score}'
+
+
 # CALLBACK TO CUSTOMIZE THE CO2 GRAPH
 @app.callback(
     Output(graph_co2_red, component_property='figure'),
@@ -133,7 +197,6 @@ def update_graph(user_input, city_input):  # function arguments come from the co
 )
 def update_graph(user_input, city_input):  # function arguments come from the component property of the Input
     df2 = df[df['city'] == city_input]
-    print(df2)
     if user_input == 'Bar Plot':
         fig = px.bar(data_frame=df2, x="scenario", y="CO2_ttw", color="component")
 
