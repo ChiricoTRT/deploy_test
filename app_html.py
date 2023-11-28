@@ -9,6 +9,7 @@ import pandas as pd
 # df = px.data.medals_long()
 # df = pd.read_csv('C:\\Users\\chirico\\Documents\\dash_test\\test_data_2.csv')
 df = pd.read_csv('https://raw.githubusercontent.com/ChiricoTRT/deploy_test/main/test_data_2.csv')
+# df = df[df['city'] == 'Brussels']
 
 all_options = {
     'impact_01_accessibility': ['Walking', 'Walking and cycling', 'Private car only'],
@@ -21,6 +22,10 @@ mygraph = dcc.Graph(figure={})
 dropdown = dcc.Dropdown(options=['Bar Plot', 'Scatter Plot'],
                         value='Bar Plot',  # initial value displayed when page first loads
                         clearable=False)
+dropdown_city = dcc.Dropdown(options=['Brussels', 'Madrid'],
+                             value='Brussels',
+                             clearable=False
+                             )
 double_filter = dcc.RadioItems(list(all_options.keys()),
                                'impact_01_accessibility',
                                id='indicators-radio_L1'
@@ -44,6 +49,8 @@ app.layout = html.Div(children=[
     html.Div(children=[
         html.Img(src=r'assets/civitas-muse-logo-whitepng.png', alt='caption', width=200)
     ], style={'textAlign': 'center'}),
+    html.Br(),
+    html.Div(children=[dropdown_city], style={'textAlign': 'center', 'width': '30%', 'margin': 'auto'}),
     html.Br(),
     mygraph,
     dropdown,
@@ -76,14 +83,18 @@ app.layout = html.Div(children=[
 # CALLBACK TO CHOOSE THE TYPE OF THE GRAPH
 @app.callback(
     Output(mygraph, component_property='figure'),
-    Input(dropdown, component_property='value')
+    Input(dropdown, component_property='value'),
+    Input(dropdown_city, component_property='value')
 )
-def update_graph(user_input):  # function arguments come from the component property of the Input
+def update_graph(user_input, city_input):  # function arguments come from the component property of the Input
+    print(city_input)
+    df2 = df[df['city'] == city_input]
+    print(df2)
     if user_input == 'Bar Plot':
-        fig = px.bar(data_frame=df, x="scenario", y="CO2_reduct", color="component")
+        fig = px.bar(data_frame=df2, x="scenario", y="CO2_reduct", color="component")
 
     elif user_input == 'Scatter Plot':
-        fig = px.scatter(data_frame=df, x="scenario", y="CO2_reduct", color="component",
+        fig = px.scatter(data_frame=df2, x="scenario", y="CO2_reduct", color="component",
                          symbol="component")
 
     return fig  # returned objects are assigned to the component property of the Output
