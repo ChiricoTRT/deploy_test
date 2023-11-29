@@ -80,24 +80,34 @@ app.layout = html.Div(children=[
                 })
     ]),
     html.Div([
+        # INDEX 1
         html.Div(children=[
             html.H2('Index 1', style={'textAlign': 'center', 'color': colors['dark_blue']}),
             radio_tr_sys_index1_method,
             html.Br(),
-            html.Div(
-                [
+            html.Div(children=[
                     html.I(
                         "Please type the inputs."),
                     html.Br(),
-                    dcc.Input(id="input1", type="number", placeholder="input 1", style={'marginRight': '10px'}),
-                    dcc.Input(id="input2", type="number", placeholder="input 2", debounce=False),
-                    html.Div(id="output"),
+                    dcc.Input(id="tr_sys_input1_stop_dist", type="number", placeholder="Stop distance", min=0.1,
+                              style={'marginRight': '10px'}),
+                    dcc.Input(id="tr_sys_input2_avg_speed", type="number", placeholder="Average speed",
+                              style={'marginRight': '10px'}),
+                    dcc.Input(id="tr_sys_input3_avg_stop_time", type="number", placeholder="Average stop time",
+                              style={'marginRight': '10px', 'margin-top': '10px'}),
+                    dcc.Input(id="tr_sys_input4_n_stop", type="number", placeholder="# stops",
+                              style={'marginRight': '10px', 'margin-top': '10px'}),
+                    dcc.Input(id="tr_sys_input5_pt_speed", type="number", placeholder="PT speed",
+                              style={'marginRight': '10px', 'margin-top': '10px'}),
+                    html.Div(id="tr_sys_output", style={'color': colors['light_blue'], 'fontSize': '14', 'fontWeight': 'bold'}),
                 ]
             ),
         ], style={'padding': 10, 'flex': 1}),
+        # INDEX 2
         html.Div(children=[
             html.H2('Index 2', style={'textAlign': 'center', 'color': colors['dark_blue']}),
         ], style={'padding': 10, 'flex': 1}),
+        # INDEX 3
         html.Div(children=[
             html.H2('Index 3', style={'textAlign': 'center', 'color': colors['dark_blue']}),
         ], style={'padding': 10, 'flex': 1})
@@ -152,23 +162,51 @@ app.layout = html.Div(children=[
     ], style={'display': 'flex', 'flexDirection': 'row'})
 ])
 
-inputs = [Input("input1", "value"), Input("input2", "value")]
-
 
 # Callback allows components to interact
 # CALLBACK FOR INDEX 1 OF TRANSPORT SYSTEM, METHOD 1
 @app.callback(
-    Output("output", "children"),
-    inputs,
-    # Input("input1", "value"),
-    # Input("input2", "value"),
+    Output("tr_sys_output", "children"),
+    Output("tr_sys_input1_stop_dist", "required"),
+    Output("tr_sys_input2_avg_speed", "required"),
+    Output("tr_sys_input3_avg_stop_time", "required"),
+    Output("tr_sys_input4_n_stop", "required"),
+    Output("tr_sys_input5_pt_speed", "required"),
+    Input("tr_sys_input1_stop_dist", "value"),
+    Input("tr_sys_input2_avg_speed", "value"),
+    Input("tr_sys_input3_avg_stop_time", "value"),
+    Input("tr_sys_input4_n_stop", "value"),
+    Input("tr_sys_input5_pt_speed", "value"),
+    Input('radio-tr-sys-index1', 'value')
 )
-def update_output(input1, input2):
-    if input1 is not None and input2 is not None:
-        score = input1 * input2
+def update_output(stop_dist, avg_speed, avg_stop_time, n_stop, pt_speed, method):
+    stop_dist_req = False
+    avg_speed_req = False
+    avg_stop_time_req = False
+    n_stop_req = False
+    pt_speed_req = False
+    # TODO: add disable mode
+    if method == 'Method 1':
+        # change requirements
+        stop_dist_req = True
+        avg_speed_req = True
+        avg_stop_time_req = True
+        n_stop_req = True
+
+        # calc
+        if stop_dist is not None and avg_speed is not None and avg_stop_time is not None and n_stop is not None:
+            score_calc = stop_dist / avg_speed * 60 * avg_stop_time * n_stop
+            string_return = f'Score: {score_calc}'
+        else:
+            string_return = f''
     else:
-        score = ""
-    return f'Score: {score}'
+        pt_speed_req = True
+        if pt_speed is not None:
+            score_calc = pt_speed
+            string_return = f'Score: {score_calc}',
+        else:
+            string_return = f''
+    return string_return, stop_dist_req, avg_speed_req, avg_stop_time_req, n_stop_req, pt_speed_req
 
 
 # CALLBACK TO CUSTOMIZE THE CO2 GRAPH
