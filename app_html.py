@@ -20,8 +20,7 @@ colors = {'light_blue': '#02ACE3',
           }
 
 # Build your components
-# app = Dash(__name__, external_stylesheets=[dbc.themes.SLATE])
-app = Dash(__name__, external_stylesheets=[dbc.themes.LITERA])
+app = Dash(__name__, external_stylesheets=[dbc.themes.LITERA]) #, suppress_callback_exceptions=True)
 graph_co2_red = dcc.Graph(figure={})
 graph_co2_ttw = dcc.Graph(figure={})
 
@@ -71,9 +70,9 @@ app.layout = html.Div(children=[
     header,
     html.Br(),
 
-    # transport system
+    # transport system mode 1
     html.Div(children=[
-        html.H2(children='Transport system',
+        html.H2(children='Transport system - mode 1',
                 style={
                     'textAlign': 'center',
                     'color': colors['light_blue']
@@ -112,6 +111,42 @@ app.layout = html.Div(children=[
             html.H2('Index 3', style={'textAlign': 'center', 'color': colors['dark_blue']}),
         ], style={'padding': 10, 'flex': 1})
     ], style={'display': 'flex', 'flexDirection': 'row'}),
+    html.Br(),
+    html.Hr(),
+    html.Br(),
+
+    # Indicators with tabs
+    html.Div(children=[
+        html.H2(children='Transport System',
+                style={'textAlign': 'center', 'color': colors['light_blue']}
+                )
+    ]),
+    html.Div([
+        # TRANSPORT INDICATOR 1: PT SPEED
+        html.Div(children=[
+            html.H2('Public Transport Speed', style={'textAlign': 'center', 'color': colors['dark_blue']}),
+            html.Div(children=[
+                html.Div([
+                    dcc.Tabs(id='tabs-tr-sys', value='tab-1', children=[
+                        dcc.Tab(label='Method 1', value='tab-1'),
+                        dcc.Tab(label='Method 2', value='tab-2'),
+                        dcc.Tab(label='Method 3', value='tab-3')
+                    ]),
+                    html.Div(id='tabs-tr-sys-content')
+                ]),
+            ]
+            ),
+        ], style={'padding': 10, 'flex': 1}),
+        # INDEX 2
+        html.Div(children=[
+            html.H2('Index 2', style={'textAlign': 'center', 'color': colors['dark_blue']}),
+        ], style={'padding': 10, 'flex': 1}),
+        # INDEX 3
+        html.Div(children=[
+            html.H2('Index 3', style={'textAlign': 'center', 'color': colors['dark_blue']}),
+        ], style={'padding': 10, 'flex': 1})
+    ], style={'display': 'flex', 'flexDirection': 'row'}),
+
 
     # -----------------------------------------------------------------------------------
     # -----------------------------------------------------------------------------------
@@ -207,6 +242,100 @@ def update_output(stop_dist, avg_speed, avg_stop_time, n_stop, pt_speed, method)
         else:
             string_return = f''
     return string_return, stop_dist_req, avg_speed_req, avg_stop_time_req, n_stop_req, pt_speed_req
+
+
+# CALLBACK FOR TABS OF TRANSPORT SYSTEM INDICATORS
+@app.callback(
+    Output('tabs-tr-sys-content', 'children'),
+    Input('tabs-tr-sys', 'value')
+)
+def render_content(tab):
+    if tab == 'tab-1':
+        return html.Div(children=[
+            html.H2("Method 1"),
+            html.I("Please fill with the input values"),
+            html.Br(),
+            html.Br(),
+            dbc.Row([
+                dbc.Col(html.Div('Stop distance [km]', style={'margin-top': '10px'})),
+                dbc.Col(
+                    dcc.Input(id="stop_dist", type="number", placeholder="Stop distance", min=0.1,
+                              style={'marginRight': '10px', 'margin-top': '10px'}),
+                ),
+            ]),
+            dbc.Row([
+                dbc.Col(html.Div('Average speed [km/h]', style={'margin-top': '10px'})),
+                dbc.Col(
+                    dcc.Input(id="avg_speed", type="number", placeholder="Average speed", min=1,
+                              style={'marginRight': '10px', 'margin-top': '10px'}),
+                ),
+            ]),
+            dbc.Row([
+                dbc.Col(html.Div('Average stop time [min]', style={'margin-top': '10px'})),
+                dbc.Col(
+                    dcc.Input(id="avg_stop_time", type="number", placeholder="Average stop time", min=1,
+                              style={'marginRight': '10px', 'margin-top': '10px'}),
+                ),
+            ]),
+            dbc.Row([
+                dbc.Col(html.Div('Number of stops', style={'margin-top': '10px'})),
+                dbc.Col(
+                    dcc.Input(id="n_stop", type="number", placeholder="# stops", min=1,
+                              style={'marginRight': '10px', 'margin-top': '10px'}),
+                ),
+            ]),
+            html.Br(),
+            html.Br(),
+            html.Div(id="pt-speed_output"),
+        ]
+        ),
+    elif tab == 'tab-2':
+        return html.Div([
+            html.H3('Tab content 2'),
+            dcc.Graph(
+                figure=dict(
+                    data=[dict(
+                        x=[1, 2, 3],
+                        y=[5, 10, 6],
+                        type='bar'
+                    )]
+                )
+            )
+        ])
+    elif tab == 'tab-3':
+        return html.Div([
+            html.H3('Tab content 2'),
+            dcc.Graph(
+                figure=dict(
+                    data=[dict(
+                        x=[1, 2, 3],
+                        y=[5, 10, 6],
+                        type='bar'
+                    )]
+                )
+            )
+        ])
+
+
+@app.callback(
+    Output("pt-speed_output", "children"),
+    Output("pt-speed_output", "style"),
+    Input("stop_dist", "value"),
+    Input("avg_speed", "value"),
+    Input("avg_stop_time", "value"),
+    Input("n_stop", "value"),
+)
+def update_output_tab(stop_dist, avg_speed, avg_stop_time, n_stop):
+    # calc
+    if stop_dist is not None and avg_speed is not None and avg_stop_time is not None and n_stop is not None:
+        score_calc = stop_dist / avg_speed * 60 * avg_stop_time * n_stop
+        string_return = f'Score: {score_calc}'
+        style_ret = {'color': colors['light_blue'], 'fontSize': '16', 'fontWeight': 'bold'}
+    else:
+        string_return = f'Please fill all the input fields'
+        style_ret = {'color': 'red'}
+
+    return string_return, style_ret
 
 
 # CALLBACK TO CUSTOMIZE THE CO2 GRAPH
