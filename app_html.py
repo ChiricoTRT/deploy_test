@@ -1,8 +1,12 @@
-from dash import Dash, dcc, Output, Input, html  # pip install dash
+import base64
+import datetime
+import io
+from dash import Dash, dcc, Output, Input, html, State, dash_table  # pip install dash
 import dash_bootstrap_components as dbc  # pip install dash-bootstrap-components
 import plotly.express as px
 import pandas as pd
-from layout_components import colors, header
+from layout_components import *
+from dash.exceptions import PreventUpdate
 
 # https://www.youtube.com/watch?v=WOWVat5BgM4&ab_channel=CharmingData
 
@@ -49,7 +53,7 @@ cost_input = dcc.Input(id='cost-input', value='', type='number')
 # -------------------------------------- LAYOUT - HTML ---------------------------------------
 # --------------------------------------------------------------------------------------------
 app.layout = html.Div(children=[
-    header,
+    layout_comp['header'],
     html.Br(),
 
     # transport system mode 1
@@ -67,21 +71,21 @@ app.layout = html.Div(children=[
             radio_tr_sys_index1_method,
             html.Br(),
             html.Div(children=[
-                    html.I(
-                        "Please type the inputs."),
-                    html.Br(),
-                    dcc.Input(id="tr_sys_input1_stop_dist", type="number", placeholder="Stop distance", min=0.1,
-                              style={'marginRight': '10px'}),
-                    dcc.Input(id="tr_sys_input2_avg_speed", type="number", placeholder="Average speed",
-                              style={'marginRight': '10px'}),
-                    dcc.Input(id="tr_sys_input3_avg_stop_time", type="number", placeholder="Average stop time",
-                              style={'marginRight': '10px', 'margin-top': '10px'}),
-                    dcc.Input(id="tr_sys_input4_n_stop", type="number", placeholder="# stops",
-                              style={'marginRight': '10px', 'margin-top': '10px'}),
-                    dcc.Input(id="tr_sys_input5_pt_speed", type="number", placeholder="PT speed",
-                              style={'marginRight': '10px', 'margin-top': '10px'}),
-                    html.Div(id="tr_sys_output", style={'color': colors['light_blue'], 'fontSize': '14', 'fontWeight': 'bold'}),
-                ]
+                html.I(
+                    "Please type the inputs."),
+                html.Br(),
+                dcc.Input(id="tr_sys_input1_stop_dist", type="number", placeholder="Stop distance", min=0.1,
+                          style={'marginRight': '10px'}),
+                dcc.Input(id="tr_sys_input2_avg_speed", type="number", placeholder="Average speed",
+                          style={'marginRight': '10px'}),
+                dcc.Input(id="tr_sys_input3_avg_stop_time", type="number", placeholder="Average stop time",
+                          style={'marginRight': '10px', 'margin-top': '10px'}),
+                dcc.Input(id="tr_sys_input4_n_stop", type="number", placeholder="# stops",
+                          style={'marginRight': '10px', 'margin-top': '10px'}),
+                dcc.Input(id="tr_sys_input5_pt_speed", type="number", placeholder="PT speed",
+                          style={'marginRight': '10px', 'margin-top': '10px'}),
+                html.Div(id="tr_sys_output", style={'color': colors['light_blue'], 'fontSize': '14', 'fontWeight': 'bold'}),
+            ]
             ),
         ], style={'padding': 10, 'flex': 1}),
         # INDEX 2
@@ -99,7 +103,7 @@ app.layout = html.Div(children=[
 
     # Indicators with tabs
     html.Div(children=[
-        html.H2(children='Transport System',
+        html.H1(children='Transport System',
                 style={'textAlign': 'center', 'color': colors['light_blue']}
                 )
     ]),
@@ -128,7 +132,6 @@ app.layout = html.Div(children=[
         #     html.H2('Index 3', style={'textAlign': 'center', 'color': colors['dark_blue']}),
         # ], style={'padding': 10, 'flex': 1})
     ], style={'display': 'flex', 'flexDirection': 'row'}),
-
 
     # -----------------------------------------------------------------------------------
     # -----------------------------------------------------------------------------------
@@ -236,8 +239,44 @@ def render_content(tab):
         return html.Div(children=[
             html.Br(),
             html.H2("Method 1"),
-            html.I("Please fill with the input values if the city has 5 routes or less"),
             html.Br(),
+            html.I("If the city has a complex routing system, you can upload a csv file:"),
+            html.Br(),
+            html.Br(),
+            html.Div([
+                dcc.Upload(
+                    id='upload-data-pt-sys',
+                    children=html.Div([
+                        'Drag and Drop or ',
+                        html.A('Select Files')
+                    ]),
+                    style={
+                        'width': '100%',
+                        'height': '60px',
+                        'lineHeight': '60px',
+                        'borderWidth': '1px',
+                        'borderStyle': 'dashed',
+                        'borderRadius': '10px',
+                        'textAlign': 'center',
+                        'background-color': 'white',
+                        'borderColor': colors['light_blue'],
+                        'color': colors['light_blue'],
+                        'fontWeight': 'bold'
+                    },
+                ),
+                html.Br(),
+                html.H3(id='title_pt_speed_res', style={'textAlign': 'center', 'color': colors['light_blue']}),
+                html.H1(id='pt-speed_output-score_file',
+                        style={
+                            'textAlign': 'center',
+                            'fontWeight': 'bold',
+                            'color': colors['green']
+                        }),
+            ]),
+            html.Br(),
+            html.Div(id='output-upload_pt_sys'),
+            html.Br(),
+            html.I("Otherwise, please fill with the input values if the city has 5 routes or less"),
             html.Br(),
             dbc.Row([
                 dbc.Col(html.Div('Stop distance [km]', style={'margin-top': '10px', 'fontWeight': 'bold'})),
@@ -320,11 +359,11 @@ def render_content(tab):
                 dbc.Col(html.Div('Number of stops', style={'margin-top': '10px', 'fontWeight': 'bold'})),
                 dbc.Row([
                     dbc.Col(
-                        dcc.Input(id="n_stop_1", type="number", placeholder="R5 stops", min=1,
+                        dcc.Input(id="n_stop_1", type="number", placeholder="R1 stops", min=1,
                                   style={'marginRight': '10px', 'margin-top': '10px'}),
                     ),
                     dbc.Col(
-                        dcc.Input(id="n_stop_2", type="number", placeholder="R4 stops", min=1,
+                        dcc.Input(id="n_stop_2", type="number", placeholder="R2 stops", min=1,
                                   style={'marginRight': '10px', 'margin-top': '10px'}),
                     ),
                     dbc.Col(
@@ -332,11 +371,11 @@ def render_content(tab):
                                   style={'marginRight': '10px', 'margin-top': '10px'}),
                     ),
                     dbc.Col(
-                        dcc.Input(id="n_stop_4", type="number", placeholder="R2 stops", min=1,
+                        dcc.Input(id="n_stop_4", type="number", placeholder="R4 stops", min=1,
                                   style={'marginRight': '10px', 'margin-top': '10px'}),
                     ),
                     dbc.Col(
-                        dcc.Input(id="n_stop_5", type="number", placeholder="R1 stops", min=1,
+                        dcc.Input(id="n_stop_5", type="number", placeholder="R5 stops", min=1,
                                   style={'marginRight': '10px', 'margin-top': '10px'}),
                     ),
                 ]),
@@ -345,7 +384,7 @@ def render_content(tab):
             html.Br(),
             html.Div(id="pt-speed_output"),
             html.Br(),
-            html.H3('Public Transport Speed Score', style={'textAlign': 'center', 'color': colors['light_blue']}),
+            html.H3(id='title_pt_speed_res_2', style={'textAlign': 'center', 'color': colors['light_blue']}),
             html.H1(id='pt-speed_output-score', style={'textAlign': 'center', 'fontWeight': 'bold', 'color': colors['green']}),
         ]
         ),
@@ -377,10 +416,33 @@ def render_content(tab):
         ])
 
 
+@app.callback(Output("pt-speed_output-score_file", "children"),
+              Output("title_pt_speed_res", 'children'),
+              Input('upload-data-pt-sys', 'contents'))
+def update_output(contents):
+    if contents is None:
+        raise PreventUpdate
+
+    content_type, content_string = contents.split(',')
+    decoded = base64.b64decode(content_string)
+    df = pd.read_csv(io.StringIO(decoded.decode('utf-8')))
+
+    PT_speed = round(
+        (df['stop_distance_km'] / df['average_speed_km_h'] * 60 + (df['average_stop_time_min'] * df['numbers_of_stops'])).mean(), 2)
+
+    if contents:
+        title = 'Public Transport Speed Score'
+    else:
+        title = ""
+
+    return PT_speed, title
+
+
 @app.callback(
     Output("pt-speed_output", "children"),
     Output("pt-speed_output", "style"),
     Output("pt-speed_output-score", "children"),
+    Output("title_pt_speed_res_2", "children"),
     Input("stop_dist_1", "value"),
     Input("stop_dist_2", "value"),
     Input("stop_dist_3", "value"),
@@ -421,6 +483,7 @@ def update_output_tab(stop_dist_1, stop_dist_2, stop_dist_3, stop_dist_4, stop_d
     style_5 = 'normal'
 
     m = ""
+    title = ""
 
     if stop_dist_1 is not None and avg_speed_1 is not None and avg_stop_time_1 is not None and n_stop_1 is not None:
         score_calc_1 = round(stop_dist_1 / avg_speed_1 * 60 * avg_stop_time_1 * n_stop_1, 5)
@@ -451,6 +514,7 @@ def update_output_tab(stop_dist_1, stop_dist_2, stop_dist_3, stop_dist_4, stop_d
                 c += 1
                 m += sc
         m = m / c
+        title = "Public Transport Speed Score"
 
         string_return = dbc.Col([
             html.Div(f'Score R1: {score_calc_1}', style={'margin-top': '10px', 'fontWeight': style_1}),
@@ -458,15 +522,13 @@ def update_output_tab(stop_dist_1, stop_dist_2, stop_dist_3, stop_dist_4, stop_d
             html.Div(f'Score R3: {score_calc_3}', style={'margin-top': '10px', 'fontWeight': style_3}),
             html.Div(f'Score R4: {score_calc_4}', style={'margin-top': '10px', 'fontWeight': style_4}),
             html.Div(f'Score R5: {score_calc_5}', style={'margin-top': '10px', 'fontWeight': style_5}),
-            html.Br(),
-            html.Div(f'Total Score: {m}', style={'margin-top': '10px', 'fontWeight': 'bold', 'color': colors['dark_blue']}),
         ]),
         style_ret = {'color': colors['light_blue'], 'fontSize': '16'}
     else:
         string_return = f'Please fill at least all the input fields of one route'
         style_ret = {'color': 'red'}
 
-    return string_return, style_ret, m
+    return string_return, style_ret, m, title
 
 
 # CALLBACK TO CUSTOMIZE THE CO2 GRAPH
