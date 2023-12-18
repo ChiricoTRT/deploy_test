@@ -2,6 +2,7 @@ from dash import Dash, dcc, Output, Input, html  # pip install dash
 import dash_bootstrap_components as dbc  # pip install dash-bootstrap-components
 import plotly.express as px
 import pandas as pd
+from layout_components import colors, header
 
 # https://www.youtube.com/watch?v=WOWVat5BgM4&ab_channel=CharmingData
 
@@ -13,11 +14,6 @@ all_options = {
     'impact_01_accessibility': ['Walking', 'Walking and cycling', 'Private car only'],
     'impact_02_sustainability': ['Low', 'Medium', 'High', 'Climate-neutral']
 }
-
-colors = {'light_blue': '#02ACE3',
-          'dark_blue': '#0047A0',
-          'green': '#8DC650'
-          }
 
 # ----------------------------------------------------------------------------------------------------
 # ------------------------------------- BUILD YOUR COMPONENTS ----------------------------------------
@@ -48,24 +44,6 @@ double_filter = dcc.RadioItems(list(all_options.keys()),
                                id='indicators-radio_L1'
                                )
 cost_input = dcc.Input(id='cost-input', value='', type='number')
-
-header = html.Div(children=[
-    # header
-    html.H1(
-        children='Test with Dash',
-        style={}
-    ),
-    # subtitle
-    html.Div(children='Subtitle', style={
-        'textAlign': 'center',
-        'color': colors['dark_blue']
-    }),
-    # logo
-    html.Div(children=[
-        html.Img(src=r'assets/civitas-muse-logo-whitepng.png', alt='caption', width=200)
-    ], style={'textAlign': 'center'})
-]
-)
 
 # --------------------------------------------------------------------------------------------
 # -------------------------------------- LAYOUT - HTML ---------------------------------------
