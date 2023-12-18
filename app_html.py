@@ -19,8 +19,10 @@ colors = {'light_blue': '#02ACE3',
           'green': '#8DC650'
           }
 
-# Build your components
-app = Dash(__name__, external_stylesheets=[dbc.themes.LITERA]) #, suppress_callback_exceptions=True)
+# ----------------------------------------------------------------------------------------------------
+# ------------------------------------- BUILD YOUR COMPONENTS ----------------------------------------
+# ----------------------------------------------------------------------------------------------------
+app = Dash(__name__, external_stylesheets=[dbc.themes.LITERA], suppress_callback_exceptions=True)
 graph_co2_red = dcc.Graph(figure={})
 graph_co2_ttw = dcc.Graph(figure={})
 
@@ -51,7 +53,7 @@ header = html.Div(children=[
     # header
     html.H1(
         children='Test with Dash',
-        style={'textAlign': 'center', 'color': colors['light_blue']}
+        style={}
     ),
     # subtitle
     html.Div(children='Subtitle', style={
@@ -65,7 +67,9 @@ header = html.Div(children=[
 ]
 )
 
-# Layout - HTML
+# --------------------------------------------------------------------------------------------
+# -------------------------------------- LAYOUT - HTML ---------------------------------------
+# --------------------------------------------------------------------------------------------
 app.layout = html.Div(children=[
     header,
     html.Br(),
@@ -138,13 +142,13 @@ app.layout = html.Div(children=[
             ),
         ], style={'padding': 10, 'flex': 1}),
         # INDEX 2
-        html.Div(children=[
-            html.H2('Index 2', style={'textAlign': 'center', 'color': colors['dark_blue']}),
-        ], style={'padding': 10, 'flex': 1}),
-        # INDEX 3
-        html.Div(children=[
-            html.H2('Index 3', style={'textAlign': 'center', 'color': colors['dark_blue']}),
-        ], style={'padding': 10, 'flex': 1})
+        # html.Div(children=[
+        #     html.H2('Index 2', style={'textAlign': 'center', 'color': colors['dark_blue']}),
+        # ], style={'padding': 10, 'flex': 1}),
+        # # INDEX 3
+        # html.Div(children=[
+        #     html.H2('Index 3', style={'textAlign': 'center', 'color': colors['dark_blue']}),
+        # ], style={'padding': 10, 'flex': 1})
     ], style={'display': 'flex', 'flexDirection': 'row'}),
 
 
@@ -252,41 +256,119 @@ def update_output(stop_dist, avg_speed, avg_stop_time, n_stop, pt_speed, method)
 def render_content(tab):
     if tab == 'tab-1':
         return html.Div(children=[
+            html.Br(),
             html.H2("Method 1"),
-            html.I("Please fill with the input values"),
+            html.I("Please fill with the input values if the city has 5 routes or less"),
             html.Br(),
             html.Br(),
             dbc.Row([
-                dbc.Col(html.Div('Stop distance [km]', style={'margin-top': '10px'})),
-                dbc.Col(
-                    dcc.Input(id="stop_dist", type="number", placeholder="Stop distance", min=0.1,
-                              style={'marginRight': '10px', 'margin-top': '10px'}),
-                ),
+                dbc.Col(html.Div('Stop distance [km]', style={'margin-top': '10px', 'fontWeight': 'bold'})),
+                dbc.Row([
+                    dbc.Col(
+                        dcc.Input(id="stop_dist_1", type="number", placeholder="Stop distance R1", min=0.1,
+                                  style={'marginRight': '10px', 'margin-top': '10px'}),
+                    ),
+                    dbc.Col(
+                        dcc.Input(id="stop_dist_2", type="number", placeholder="Stop distance R2", min=0.1,
+                                  style={'marginRight': '10px', 'margin-top': '10px'}),
+                    ),
+                    dbc.Col(
+                        dcc.Input(id="stop_dist_3", type="number", placeholder="Stop distance R3", min=0.1,
+                                  style={'marginRight': '10px', 'margin-top': '10px'}),
+                    ),
+                    dbc.Col(
+                        dcc.Input(id="stop_dist_4", type="number", placeholder="Stop distance R4", min=0.1,
+                                  style={'marginRight': '10px', 'margin-top': '10px'}),
+                    ),
+                    dbc.Col(
+                        dcc.Input(id="stop_dist_5", type="number", placeholder="Stop distance R5", min=0.1,
+                                  style={'marginRight': '10px', 'margin-top': '10px'}),
+                    ),
+                ]),
             ]),
             dbc.Row([
-                dbc.Col(html.Div('Average speed [km/h]', style={'margin-top': '10px'})),
-                dbc.Col(
-                    dcc.Input(id="avg_speed", type="number", placeholder="Average speed", min=1,
-                              style={'marginRight': '10px', 'margin-top': '10px'}),
-                ),
+                dbc.Col(html.Div('Average speed [km/h]', style={'margin-top': '10px', 'fontWeight': 'bold'})),
+                dbc.Row([
+                    dbc.Col(
+                        dcc.Input(id="avg_speed_1", type="number", placeholder="Average speed R1", min=1,
+                                  style={'marginRight': '10px', 'margin-top': '10px'}),
+                    ),
+                    dbc.Col(
+                        dcc.Input(id="avg_speed_2", type="number", placeholder="Average speed R2", min=1,
+                                  style={'marginRight': '10px', 'margin-top': '10px'}),
+                    ),
+                    dbc.Col(
+                        dcc.Input(id="avg_speed_3", type="number", placeholder="Average speed R3", min=1,
+                                  style={'marginRight': '10px', 'margin-top': '10px'}),
+                    ),
+                    dbc.Col(
+                        dcc.Input(id="avg_speed_4", type="number", placeholder="Average speed R4", min=1,
+                                  style={'marginRight': '10px', 'margin-top': '10px'}),
+                    ),
+                    dbc.Col(
+                        dcc.Input(id="avg_speed_5", type="number", placeholder="Average speed R5", min=1,
+                                  style={'marginRight': '10px', 'margin-top': '10px'}),
+                    ),
+                ]),
+
             ]),
             dbc.Row([
-                dbc.Col(html.Div('Average stop time [min]', style={'margin-top': '10px'})),
-                dbc.Col(
-                    dcc.Input(id="avg_stop_time", type="number", placeholder="Average stop time", min=1,
-                              style={'marginRight': '10px', 'margin-top': '10px'}),
-                ),
+                dbc.Col(html.Div('Average stop time [min]', style={'margin-top': '10px', 'fontWeight': 'bold'})),
+                dbc.Row([
+                    dbc.Col(
+                        dcc.Input(id="avg_stop_time_1", type="number", placeholder="Average stop time R1", min=1,
+                                  style={'marginRight': '10px', 'margin-top': '10px'}),
+                    ),
+                    dbc.Col(
+                        dcc.Input(id="avg_stop_time_2", type="number", placeholder="Average stop time R2", min=1,
+                                  style={'marginRight': '10px', 'margin-top': '10px'}),
+                    ),
+                    dbc.Col(
+                        dcc.Input(id="avg_stop_time_3", type="number", placeholder="Average stop time R3", min=1,
+                                  style={'marginRight': '10px', 'margin-top': '10px'}),
+                    ),
+                    dbc.Col(
+                        dcc.Input(id="avg_stop_time_4", type="number", placeholder="Average stop time R4", min=1,
+                                  style={'marginRight': '10px', 'margin-top': '10px'}),
+                    ),
+                    dbc.Col(
+                        dcc.Input(id="avg_stop_time_5", type="number", placeholder="Average stop time R5", min=1,
+                                  style={'marginRight': '10px', 'margin-top': '10px'}),
+                    ),
+                ]),
+
             ]),
             dbc.Row([
-                dbc.Col(html.Div('Number of stops', style={'margin-top': '10px'})),
-                dbc.Col(
-                    dcc.Input(id="n_stop", type="number", placeholder="# stops", min=1,
-                              style={'marginRight': '10px', 'margin-top': '10px'}),
-                ),
+                dbc.Col(html.Div('Number of stops', style={'margin-top': '10px', 'fontWeight': 'bold'})),
+                dbc.Row([
+                    dbc.Col(
+                        dcc.Input(id="n_stop_1", type="number", placeholder="R5 stops", min=1,
+                                  style={'marginRight': '10px', 'margin-top': '10px'}),
+                    ),
+                    dbc.Col(
+                        dcc.Input(id="n_stop_2", type="number", placeholder="R4 stops", min=1,
+                                  style={'marginRight': '10px', 'margin-top': '10px'}),
+                    ),
+                    dbc.Col(
+                        dcc.Input(id="n_stop_3", type="number", placeholder="R3 stops", min=1,
+                                  style={'marginRight': '10px', 'margin-top': '10px'}),
+                    ),
+                    dbc.Col(
+                        dcc.Input(id="n_stop_4", type="number", placeholder="R2 stops", min=1,
+                                  style={'marginRight': '10px', 'margin-top': '10px'}),
+                    ),
+                    dbc.Col(
+                        dcc.Input(id="n_stop_5", type="number", placeholder="R1 stops", min=1,
+                                  style={'marginRight': '10px', 'margin-top': '10px'}),
+                    ),
+                ]),
             ]),
             html.Br(),
             html.Br(),
             html.Div(id="pt-speed_output"),
+            html.Br(),
+            html.H3('Public Transport Speed Score', style={'textAlign': 'center', 'color': colors['light_blue']}),
+            html.H1(id='pt-speed_output-score', style={'textAlign': 'center', 'fontWeight': 'bold', 'color': colors['green']}),
         ]
         ),
     elif tab == 'tab-2':
@@ -320,22 +402,93 @@ def render_content(tab):
 @app.callback(
     Output("pt-speed_output", "children"),
     Output("pt-speed_output", "style"),
-    Input("stop_dist", "value"),
-    Input("avg_speed", "value"),
-    Input("avg_stop_time", "value"),
-    Input("n_stop", "value"),
+    Output("pt-speed_output-score", "children"),
+    Input("stop_dist_1", "value"),
+    Input("stop_dist_2", "value"),
+    Input("stop_dist_3", "value"),
+    Input("stop_dist_4", "value"),
+    Input("stop_dist_5", "value"),
+    Input("avg_speed_1", "value"),
+    Input("avg_speed_2", "value"),
+    Input("avg_speed_3", "value"),
+    Input("avg_speed_4", "value"),
+    Input("avg_speed_5", "value"),
+    Input("avg_stop_time_1", "value"),
+    Input("avg_stop_time_2", "value"),
+    Input("avg_stop_time_3", "value"),
+    Input("avg_stop_time_4", "value"),
+    Input("avg_stop_time_5", "value"),
+    Input("n_stop_1", "value"),
+    Input("n_stop_2", "value"),
+    Input("n_stop_3", "value"),
+    Input("n_stop_4", "value"),
+    Input("n_stop_5", "value"),
 )
-def update_output_tab(stop_dist, avg_speed, avg_stop_time, n_stop):
+def update_output_tab(stop_dist_1, stop_dist_2, stop_dist_3, stop_dist_4, stop_dist_5,
+                      avg_speed_1, avg_speed_2, avg_speed_3, avg_speed_4, avg_speed_5,
+                      avg_stop_time_1, avg_stop_time_2, avg_stop_time_3, avg_stop_time_4, avg_stop_time_5,
+                      n_stop_1, n_stop_2, n_stop_3, n_stop_4, n_stop_5
+                      ):
     # calc
-    if stop_dist is not None and avg_speed is not None and avg_stop_time is not None and n_stop is not None:
-        score_calc = stop_dist / avg_speed * 60 * avg_stop_time * n_stop
-        string_return = f'Score: {score_calc}'
-        style_ret = {'color': colors['light_blue'], 'fontSize': '16', 'fontWeight': 'bold'}
+    score_calc_1 = None
+    score_calc_2 = None
+    score_calc_3 = None
+    score_calc_4 = None
+    score_calc_5 = None
+
+    style_1 = 'normal'
+    style_2 = 'normal'
+    style_3 = 'normal'
+    style_4 = 'normal'
+    style_5 = 'normal'
+
+    m = ""
+
+    if stop_dist_1 is not None and avg_speed_1 is not None and avg_stop_time_1 is not None and n_stop_1 is not None:
+        score_calc_1 = round(stop_dist_1 / avg_speed_1 * 60 * avg_stop_time_1 * n_stop_1, 5)
+        style_1 = 'bold'
+
+    if stop_dist_2 is not None and avg_speed_2 is not None and avg_stop_time_2 is not None and n_stop_2 is not None:
+        score_calc_2 = round(stop_dist_2 / avg_speed_2 * 60 * avg_stop_time_2 * n_stop_2, 2)
+        style_2 = 'bold'
+
+    if stop_dist_3 is not None and avg_speed_3 is not None and avg_stop_time_3 is not None and n_stop_3 is not None:
+        score_calc_3 = round(stop_dist_3 / avg_speed_3 * 60 * avg_stop_time_3 * n_stop_3, 2)
+        style_3 = 'bold'
+
+    if stop_dist_4 is not None and avg_speed_4 is not None and avg_stop_time_4 is not None and n_stop_4 is not None:
+        score_calc_4 = round(stop_dist_4 / avg_speed_4 * 60 * avg_stop_time_4 * n_stop_4, 2)
+        style_4 = 'bold'
+
+    if stop_dist_5 is not None and avg_speed_5 is not None and avg_stop_time_5 is not None and n_stop_5 is not None:
+        score_calc_5 = round(stop_dist_5 / avg_speed_5 * 60 * avg_stop_time_5 * n_stop_5, 2)
+        style_5 = 'bold'
+
+    if score_calc_1 or score_calc_2 or score_calc_3 or score_calc_4 or score_calc_5:
+        # mean of valid arguments
+        m = 0
+        c = 0
+        for sc in [score_calc_1, score_calc_2, score_calc_3, score_calc_4, score_calc_5]:
+            if sc is not None:
+                c += 1
+                m += sc
+        m = m / c
+
+        string_return = dbc.Col([
+            html.Div(f'Score R1: {score_calc_1}', style={'margin-top': '10px', 'fontWeight': style_1}),
+            html.Div(f'Score R2: {score_calc_2}', style={'margin-top': '10px', 'fontWeight': style_2}),
+            html.Div(f'Score R3: {score_calc_3}', style={'margin-top': '10px', 'fontWeight': style_3}),
+            html.Div(f'Score R4: {score_calc_4}', style={'margin-top': '10px', 'fontWeight': style_4}),
+            html.Div(f'Score R5: {score_calc_5}', style={'margin-top': '10px', 'fontWeight': style_5}),
+            html.Br(),
+            html.Div(f'Total Score: {m}', style={'margin-top': '10px', 'fontWeight': 'bold', 'color': colors['dark_blue']}),
+        ]),
+        style_ret = {'color': colors['light_blue'], 'fontSize': '16'}
     else:
-        string_return = f'Please fill all the input fields'
+        string_return = f'Please fill at least all the input fields of one route'
         style_ret = {'color': 'red'}
 
-    return string_return, style_ret
+    return string_return, style_ret, m
 
 
 # CALLBACK TO CUSTOMIZE THE CO2 GRAPH
