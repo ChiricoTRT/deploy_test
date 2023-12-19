@@ -158,3 +158,21 @@ input_5_routes_pt_speed = html.Div([
         ]),
     ]),
 ])
+
+
+# RESULTS CARDS
+card_pt_system = dbc.Card(
+    [
+        dbc.CardImg(src=r'assets/transport.png', top=True),
+        dbc.CardBody(
+            [
+                html.H4("Transport score", className="card-title", style={'textAlign': 'center'}),
+                html.H2(id='transport-score', style={
+                    'textAlign': 'center',
+                    'color': colors['green']
+                }),
+            ]
+        ),
+    ],
+    style={"width": "18rem"},
+)

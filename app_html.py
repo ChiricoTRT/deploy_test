@@ -24,12 +24,6 @@ all_options = {
 # ----------------------------------------------------------------------------------------------------
 app = Dash(__name__, external_stylesheets=[dbc.themes.LITERA], suppress_callback_exceptions=True)
 
-double_filter = dcc.RadioItems(list(all_options.keys()),
-                               'impact_01_accessibility',
-                               id='indicators-radio_L1'
-                               )
-cost_input = dcc.Input(id='cost-input', value='', type='number')
-
 # --------------------------------------------------------------------------------------------
 # -------------------------------------- LAYOUT - HTML ---------------------------------------
 # --------------------------------------------------------------------------------------------
@@ -72,6 +66,41 @@ app.layout = html.Div(children=[
         #     html.H2('Index 3', style={'textAlign': 'center', 'color': colors['dark_blue']}),
         # ], style={'padding': 10, 'flex': 1})
     ], style={'display': 'flex', 'flexDirection': 'row'}),
+
+    html.Br(),
+    html.Br(),
+    html.Hr(),
+    html.Br(),
+    html.Br(),
+    # SOCIETY
+    html.Div(children=[
+        html.H1(children='Society',
+                style={'textAlign': 'center', 'color': colors['light_blue']}
+                )
+    ]),
+    html.Br(),
+    html.Br(),
+    html.Hr(),
+    html.Br(),
+    html.Br(),
+    # ECONOMY
+    html.Div(children=[
+        html.H1(children='Economy',
+                style={'textAlign': 'center', 'color': colors['light_blue']}
+                )
+    ]),
+    html.Br(),
+    html.Br(),
+    html.Hr(),
+    html.Br(),
+    html.Br(),
+    # RESULTS
+    html.Div(children=[
+        html.H1(children='Results',
+                style={'textAlign': 'center', 'color': colors['light_blue']}
+                ),
+        card_pt_system
+    ]),
     footer,
 ])
 
@@ -118,7 +147,7 @@ def render_content(tab):
                         dcc.Download(id='download-sample-ptsys'),
                         html.Button("Download sample dataset", id='btn-download-sample-ptsys',
                                     style={
-                                        'width': '100%',
+                                        'width': '50%',
                                         'height': '60px',
                                         'lineHeight': '60px',
                                         'borderStyle': 'none',
@@ -127,7 +156,22 @@ def render_content(tab):
                                         'color': colors['dark_blue'],
                                         'fontWeight': 'bold'
                                     }),
-                    ]),
+                    ], style={'textAlign': 'center'}),
+                    dbc.Col([
+                        dcc.Store(id='memory-data'),
+                        html.Button("Save", id='btn-save-ptsys', disabled=True,
+                                    style={
+                                        'width': '30%',
+                                        'height': '60px',
+                                        'lineHeight': '60px',
+                                        'borderStyle': 'none',
+                                        'textAlign': 'center',
+                                        'background-color': 'grey',
+                                        'color': 'white',
+                                        'borderRadius': '10px',
+                                        'fontWeight': 'bold'
+                                    }),
+                    ], style={'textAlign': 'center'}),
                 ]),
                 html.Br(),
                 html.H3(id='title_pt_speed_res', style={'textAlign': 'center', 'color': colors['light_blue']}),
@@ -141,7 +185,7 @@ def render_content(tab):
             html.Br(),
             html.Div(id='output-upload_pt_sys'),
             html.Br(),
-            html.I("Otherwise, if the city has up to 5 routes, please fill with the input values"),
+            html.I("Otherwise, if the city has up to 5 routes, please fill with the input values below:"),
             html.Br(),
             # collapse
             html.Div(
@@ -151,8 +195,13 @@ def render_content(tab):
                         "Show/hide input format",
                         id="collapse-button",
                         className="mb-3",
-                        color="primary",
                         n_clicks=0,
+                        style={
+                            'borderStyle': 'none',
+                            'background-color': colors['light_blue'],
+                            'color': 'white',
+                            'fontWeight': 'bold'
+                        }
                     ),
                     dbc.Collapse(children=[
                         input_5_routes_pt_speed,
@@ -163,7 +212,21 @@ def render_content(tab):
                         html.H3(id='title_pt_speed_res_2', style={'textAlign': 'center', 'color': colors['light_blue']}),
                         html.H1(id='pt-speed_output-score',
                                 style={'textAlign': 'center', 'fontWeight': 'bold', 'color': colors['green']}),
-
+                        dbc.Col([
+                            dcc.Store(id='memory-data'),
+                            html.Button("Save", id='btn-save-ptsys-2', disabled=True,
+                                        style={
+                                            'width': '10%',
+                                            'height': '60px',
+                                            'lineHeight': '60px',
+                                            'borderStyle': 'none',
+                                            'textAlign': 'center',
+                                            'background-color': 'grey',
+                                            'color': 'white',
+                                            'borderRadius': '10px',
+                                            'fontWeight': 'bold'
+                                        }),
+                        ], style={'textAlign': 'center'}),
                     ],
                         id="collapse",
                         is_open=False,
@@ -202,6 +265,8 @@ def render_content(tab):
 
 @app.callback(Output("pt-speed_output-score_file", "children"),
               Output("title_pt_speed_res", 'children'),
+              Output('btn-save-ptsys', 'style'),
+              Output('btn-save-ptsys', 'disabled'),
               Input('upload-data-pt-sys', 'contents'))
 def update_output(contents):
     if contents is None:
@@ -214,12 +279,27 @@ def update_output(contents):
     pt_speed = round(
         (df['stop_distance_km'] / df['average_speed_km_h'] * 60 + (df['average_stop_time_min'] * df['numbers_of_stops'])).mean(), 2)
 
+    btn_disabled = True
+    btn_style = {}
+
     if contents:
         title = 'Public Transport Speed Score'
+        btn_style = {
+            'width': '30%',
+            'height': '60px',
+            'lineHeight': '60px',
+            'borderStyle': 'none',
+            'textAlign': 'center',
+            'background-color': colors['green'],
+            'color': 'white',
+            'borderRadius': '10px',
+            'fontWeight': 'bold'
+        }
+        btn_disabled = False
     else:
         title = ""
 
-    return pt_speed, title
+    return pt_speed, title, btn_style, btn_disabled
 
 
 @app.callback(
@@ -227,6 +307,8 @@ def update_output(contents):
     Output("pt-speed_output", "style"),
     Output("pt-speed_output-score", "children"),
     Output("title_pt_speed_res_2", "children"),
+    Output('btn-save-ptsys-2', 'style'),
+    Output('btn-save-ptsys-2', 'disabled'),
     Input("stop_dist_1", "value"),
     Input("stop_dist_2", "value"),
     Input("stop_dist_3", "value"),
@@ -268,6 +350,18 @@ def update_output_tab(stop_dist_1, stop_dist_2, stop_dist_3, stop_dist_4, stop_d
 
     m = ""
     title = ""
+    btn_disabled = True
+    btn_style = {
+        'width': '10%',
+        'height': '60px',
+        'lineHeight': '60px',
+        'borderStyle': 'none',
+        'textAlign': 'center',
+        'background-color': 'grey',
+        'color': 'white',
+        'borderRadius': '10px',
+        'fontWeight': 'bold'
+    }
 
     if stop_dist_1 is not None and avg_speed_1 is not None and avg_stop_time_1 is not None and n_stop_1 is not None:
         score_calc_1 = round(stop_dist_1 / avg_speed_1 * 60 * avg_stop_time_1 * n_stop_1, 5)
@@ -299,6 +393,18 @@ def update_output_tab(stop_dist_1, stop_dist_2, stop_dist_3, stop_dist_4, stop_d
                 m += sc
         m = m / c
         title = "Public Transport Speed Score"
+        btn_disabled = False
+        btn_style = {
+            'width': '10%',
+            'height': '60px',
+            'lineHeight': '60px',
+            'borderStyle': 'none',
+            'textAlign': 'center',
+            'background-color': colors['green'],
+            'color': 'white',
+            'borderRadius': '10px',
+            'fontWeight': 'bold'
+        }
 
         string_return = dbc.Col([
             html.Div(f'Score R1: {score_calc_1}', style={'margin-top': '10px', 'fontWeight': style_1}),
@@ -312,7 +418,7 @@ def update_output_tab(stop_dist_1, stop_dist_2, stop_dist_3, stop_dist_4, stop_d
         string_return = f'Please fill at least all the input fields of one route'
         style_ret = {'color': 'red'}
 
-    return string_return, style_ret, m, title
+    return string_return, style_ret, m, title, btn_style, btn_disabled
 
 
 @app.callback(
@@ -333,6 +439,42 @@ def toggle_collapse(n, is_open):
     if n:
         return not is_open
     return is_open
+
+
+@app.callback(
+    Output("memory-data", "data", allow_duplicate=True),
+    Input("btn-save-ptsys", "n_clicks"),
+    Input("pt-speed_output-score_file", "children"),
+    prevent_initial_call=True
+)
+def save_pt_sys(n_click, score):
+    if n_click is None:
+        raise PreventUpdate
+
+    return score
+
+
+@app.callback(
+    Output("memory-data", "data"),
+    Input("btn-save-ptsys-2", "n_clicks"),
+    Input("pt-speed_output-score", "children")
+)
+def save_pt_sys(n_click, score):
+    if n_click is None:
+        raise PreventUpdate
+
+    return score
+
+
+@app.callback(
+    Output("transport-score", "children"),
+    Input("memory-data", "data"),
+)
+def update_transport_results(data):
+    if data is None:
+        raise PreventUpdate
+
+    return data
 
 
 # Run app
