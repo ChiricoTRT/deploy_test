@@ -14,11 +14,6 @@ from dash.exceptions import PreventUpdate
 df = pd.read_csv('https://raw.githubusercontent.com/ChiricoTRT/deploy_test/main/test_data_2.csv')
 sample_pt_speed = pd.read_csv('https://raw.githubusercontent.com/ChiricoTRT/deploy_test/main/Routes.csv')
 
-all_options = {
-    'impact_01_accessibility': ['Walking', 'Walking and cycling', 'Private car only'],
-    'impact_02_sustainability': ['Low', 'Medium', 'High', 'Climate-neutral']
-}
-
 # ----------------------------------------------------------------------------------------------------
 # ------------------------------------- BUILD YOUR COMPONENTS ----------------------------------------
 # ----------------------------------------------------------------------------------------------------
@@ -237,16 +232,58 @@ def render_content(tab):
         ),
     elif tab == 'tab-2':
         return html.Div([
-            html.H3('Tab content 2'),
-            dcc.Graph(
-                figure=dict(
-                    data=[dict(
-                        x=[1, 2, 3],
-                        y=[5, 10, 6],
-                        type='bar'
-                    )]
-                )
-            )
+            html.Br(),
+            html.H2("Method 2"),
+            html.Br(),
+            html.I("Please fill the inputs:"),
+            html.Br(),
+            dcc.Input(id="measured-time-min", type="number", placeholder="Measured time (min)", min=1,
+                      style={'marginRight': '10px', 'margin-top': '10px'}),
+            dcc.Input(id="measured-time-sec", type="number", placeholder="Measured time (sec)", min=0,
+                      max=59,
+                      style={'marginRight': '10px', 'margin-top': '10px'}),
+            html.Button("Add", id='measured-time-confirm',
+                        style={
+                            'width': '10%', 'height': '60px', 'lineHeight': '60px', 'borderStyle': 'none',
+                            'textAlign': 'center', 'background-color': 'grey', 'color': 'white',
+                            'borderRadius': '10px', 'fontWeight': 'bold', 'marginRight': '10px'
+                        }),
+            html.Button("Reset", id='measured-time-reset', disabled=True,
+                        style={
+                            'width': '10%', 'height': '60px', 'lineHeight': '60px', 'borderStyle': 'none',
+                            'textAlign': 'center', 'background-color': 'grey', 'color': 'white',
+                            'borderRadius': '10px', 'fontWeight': 'bold', 'marginRight': '10px'
+                        }
+                        ),
+            html.Br(),
+            html.I("Added values:"),
+            html.Br(),
+            html.Div([], id='ptsys-m2-out-list'),
+            html.Br(),
+            html.H3("", id='ptsys-m2-res-title',
+                    style={'textAlign': 'center', 'color': colors['light_blue']}),
+            html.H1(id='ptsys-m2-result',
+                    style={
+                        'textAlign': 'center',
+                        'fontWeight': 'bold',
+                        'color': colors['green']
+                    }),
+            html.Br(),
+            dbc.Col([
+                dcc.Store(id='memory-data'),
+                html.Button("Save", id='btn-save-ptsys-m2', disabled=True,
+                            style={
+                                'width': '10%',
+                                'height': '60px',
+                                'lineHeight': '60px',
+                                'borderStyle': 'none',
+                                'textAlign': 'center',
+                                'background-color': 'grey',
+                                'color': 'white',
+                                'borderRadius': '10px',
+                                'fontWeight': 'bold'
+                            }),
+            ], style={'textAlign': 'center'}),
         ])
     elif tab == 'tab-3':
         return html.Div([
@@ -261,6 +298,116 @@ def render_content(tab):
                 )
             )
         ])
+
+
+@app.callback(
+    Output('ptsys-m2-result', 'children', allow_duplicate=True),
+    Output('ptsys-m2-out-list', 'children', allow_duplicate=True),
+    Input('measured-time-reset', 'n_clicks'),
+    prevent_initial_call=True
+)
+def reset_pt_sys_m2(n_clicks):
+    if n_clicks:
+        result = ""
+        added_list = []
+
+    return result, added_list
+
+
+@app.callback(Output('ptsys-m2-out-list', 'children', allow_duplicate=True),
+              Output('measured-time-confirm', 'disabled'),
+              Output('measured-time-confirm', 'style'),
+              Output('measured-time-min', 'value'),
+              Output('measured-time-sec', 'value'),
+              Output('measured-time-confirm', 'n_clicks'),
+              Output('ptsys-m2-result', 'children', allow_duplicate=True),
+              Output('ptsys-m2-res-title', 'children'),
+              Output('btn-save-ptsys-m2', 'disabled', allow_duplicate=True),
+              Output('btn-save-ptsys-m2', 'style'),
+              Output('measured-time-reset', 'disabled'),
+              Input('ptsys-m2-out-list', 'children'),
+              Input('measured-time-min', 'value'),
+              Input('measured-time-sec', 'value'),
+              Input('measured-time-confirm', 'n_clicks'),
+              Input('ptsys-m2-result', 'children'),
+              prevent_initial_call=True)
+def add_measured_time(out_value, mins, secs, n_click, result):
+    reset_btn_disable = True
+    if len(out_value) > 0:
+        reset_btn_disable = False
+
+    btn_disabled = True
+    btn_style = {'width': '10%', 'height': '60px', 'lineHeight': '60px', 'borderStyle': 'none',
+                 'textAlign': 'center', 'background-color': 'grey', 'color': 'white',
+                 'borderRadius': '10px', 'fontWeight': 'bold', 'marginRight': '10px'
+                 }
+
+    if mins is not None or secs is not None:
+        btn_disabled = False
+        btn_style = {'width': '10%', 'height': '60px', 'lineHeight': '60px', 'borderStyle': 'none',
+                     'textAlign': 'center', 'background-color': colors['green'], 'color': 'white',
+                     'borderRadius': '10px', 'fontWeight': 'bold', 'marginRight': '10px'
+                     }
+    if n_click:
+        reset_val_min = None
+        reset_val_sec = None
+        btn_disabled = True
+        n_click = None
+        reset_btn_disable = False
+        btn_style = {'width': '10%', 'height': '60px', 'lineHeight': '60px', 'borderStyle': 'none',
+                     'textAlign': 'center', 'background-color': 'grey', 'color': 'white',
+                     'borderRadius': '10px', 'fontWeight': 'bold', 'marginRight': '10px'
+                     }
+        if mins is not None and secs is not None:
+            out_value.append(round(mins + secs / 60, 2))
+            out_value.append(" | ")
+        if mins is not None and secs is None:
+            out_value.append(round(mins, 2))
+            out_value.append(" | ")
+        if mins is None and secs is not None:
+            out_value.append(round(secs / 60, 2))
+            out_value.append(" | ")
+        tmp = []
+        for r in out_value:
+            if r != " | ":
+                tmp.append(r)
+        result = round(sum(tmp) / len(tmp), 2)
+
+    else:
+        reset_val_min = mins
+        reset_val_sec = secs
+    if result is not None:
+        title = "Public Transport Speed Score"
+        save_disable = False
+        save_style = {
+            'width': '10%',
+            'height': '60px',
+            'lineHeight': '60px',
+            'borderStyle': 'none',
+            'textAlign': 'center',
+            'background-color': colors['green'],
+            'color': 'white',
+            'borderRadius': '10px',
+            'fontWeight': 'bold',
+            'marginRight': '10px'
+        }
+    else:
+        title = ""
+        save_disable = True
+        save_style = {
+            'width': '10%',
+            'height': '60px',
+            'lineHeight': '60px',
+            'borderStyle': 'none',
+            'textAlign': 'center',
+            'background-color': 'grey',
+            'color': 'white',
+            'borderRadius': '10px',
+            'fontWeight': 'bold'
+        }
+
+    return out_value, btn_disabled, btn_style, reset_val_min, reset_val_sec, n_click, result, title, \
+           save_disable, save_style, reset_btn_disable
 
 
 @app.callback(Output("pt-speed_output-score_file", "children"),
@@ -443,6 +590,7 @@ def toggle_collapse(n, is_open):
 
 @app.callback(
     Output("memory-data", "data", allow_duplicate=True),
+    Output("btn-save-ptsys", "n_clicks"),
     Input("btn-save-ptsys", "n_clicks"),
     Input("pt-speed_output-score_file", "children"),
     prevent_initial_call=True
@@ -450,20 +598,42 @@ def toggle_collapse(n, is_open):
 def save_pt_sys(n_click, score):
     if n_click is None:
         raise PreventUpdate
+    else:
+        n_click_reset = None
 
-    return score
+    return score, n_click_reset
 
 
 @app.callback(
-    Output("memory-data", "data"),
+    Output("memory-data", "data", allow_duplicate=True),
+    Output("btn-save-ptsys-2", "n_clicks"),
     Input("btn-save-ptsys-2", "n_clicks"),
-    Input("pt-speed_output-score", "children")
+    Input("pt-speed_output-score", "children"),
+    prevent_initial_call=True
 )
 def save_pt_sys(n_click, score):
     if n_click is None:
         raise PreventUpdate
+    else:
+        n_click_reset = None
 
-    return score
+    return score, n_click_reset
+
+
+@app.callback(
+    Output("memory-data", "data", allow_duplicate=True),
+    Output("btn-save-ptsys-m2", "n_clicks"),
+    Input("btn-save-ptsys-m2", "n_clicks"),
+    Input("ptsys-m2-result", "children"),
+    prevent_initial_call=True
+)
+def save_pt_sys(n_click, score):
+    if n_click is None:
+        raise PreventUpdate
+    else:
+        n_click_reset = None
+
+    return score, n_click_reset
 
 
 @app.callback(
