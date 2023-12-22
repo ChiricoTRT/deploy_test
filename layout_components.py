@@ -6,6 +6,11 @@ colors = {'light_blue': '#02ACE3',
           'green': '#8DC650'
           }
 
+tab_style = {'fontWeight': 'normal'}
+tab_selected_style = {
+    'fontWeight': 'bold',
+}
+
 # ----------------------------------------------------------------------------------------
 # --------------------------------------- HEADER -----------------------------------------
 # ----------------------------------------------------------------------------------------
@@ -174,7 +179,9 @@ input_5_routes_pt_speed_m1 = html.Div([
 # ----------------------------------------------------------------------------------------
 # _body is referred to the card in the body of the page, _results to the card on the
 # bottom of the page
-card_pt_system_body = dbc.Card(
+
+# ------------------------------------ PT SPEED ------------------------------------------
+card_pt_system_ptspeed_body = dbc.Card(
     [
         dbc.CardImg(src=r'assets/transport.png', top=True),
         dbc.CardBody(
@@ -190,7 +197,7 @@ card_pt_system_body = dbc.Card(
     style={'width': '18rem', 'borderColor': colors['green']},
 )
 
-card_pt_system_results = dbc.Card(
+card_pt_system_ptspeed_results = dbc.Card(
     [
         dbc.CardImg(src=r'assets/transport.png', top=True),
         dbc.CardBody(
@@ -199,6 +206,23 @@ card_pt_system_results = dbc.Card(
                 html.H2(id='transport-score-results', style={
                     'textAlign': 'center',
                     'color': colors['green']
+                }),
+            ]
+        ),
+    ],
+    style={'width': '18rem', 'borderColor': colors['green']},
+)
+
+# ------------------------------------ NO CAR ------------------------------------------
+card_pt_system_nocar_body = dbc.Card(
+    [
+        dbc.CardImg(src=r'assets/transport.png', top=True),
+        dbc.CardBody(
+            [
+                html.H4('Alternative to car Score', className='card-title', style={'textAlign': 'center'}),
+                html.H2(id='nocar-score-body', style={
+                    'textAlign': 'center',
+                    'color': colors['green'],
                 }),
             ]
         ),

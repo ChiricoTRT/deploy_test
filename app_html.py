@@ -25,12 +25,13 @@ app = Dash(__name__, external_stylesheets=[dbc.themes.LITERA], suppress_callback
 app.layout = html.Div(children=[
     header,
 
-    # Public Transport Indicators with tabs
+    # Public Transport Indicators Title
     html.Div(children=[
         html.H1(children='Transport System',
                 style={'textAlign': 'center', 'color': colors['light_blue']}
                 )
     ]),
+
     # TRANSPORT INDICATOR 1: PT SPEED
     html.Div(children=[
         html.H2('Public Transport Speed', style={'textAlign': 'center', 'color': colors['dark_blue']}),
@@ -44,36 +45,56 @@ app.layout = html.Div(children=[
                         dcc.Tab(label='Method 2', value='tab-2-ptspeed'),
                         dcc.Tab(label='Method 3', value='tab-3-ptspeed')
                     ]),
-                    html.Div(id='tabs-tr-sys-content')
+                    html.Div(id='tabs-ptspeed-content')
                 ]),
             ]), width=10,
             ),
             # right column for the score card
             dbc.Col(html.Div(children=[
-                card_pt_system_body
+                card_pt_system_ptspeed_body
             ]), width=2,
                 style={'textAlign': 'center', 'border': 'none'},
                 align='center'
             ),
         ]),
-        # html.Div(children=[
-        #     html.Div([
-        #         dcc.Tabs(id='tabs-ptspeed', value='tab-1-ptspeed', children=[
-        #             dcc.Tab(label='Method 1', value='tab-1-ptspeed'),
-        #             dcc.Tab(label='Method 2', value='tab-2-ptspeed'),
-        #             dcc.Tab(label='Method 3', value='tab-3-ptspeed')
-        #         ]),
-        #         html.Div(id='tabs-tr-sys-content')
-        #     ]),
-        # ]
-        # ),
     ], style={'padding': 10, 'flex': 1}),
-
-    html.Br(),
     html.Br(),
     html.Hr(),
     html.Br(),
+
+    # TRANSPORT INDICATOR 2: ALTERNATIVE TO PRIVATE MEANS OF TRANSPORT
+    html.Div(children=[
+        html.H2('Alternative to private car index', style={'textAlign': 'center', 'color': colors['dark_blue']}),
+        html.Br(),
+        dbc.Row([
+            # left column for the calculation
+            dbc.Col(html.Div(children=[
+                html.Div([
+                    dcc.Tabs(id='tabs-nocar', value='tab-1-nocar', children=[
+                        dcc.Tab(label='Local', value='tab-1-nocar', style=tab_style, selected_style=tab_selected_style),
+                        dcc.Tab(label='Whole City', value='tab-2-nocar', style=tab_style, selected_style=tab_selected_style),
+                    ]),
+                    html.Div(id='tabs-nocar-content')
+                ]),
+            ]), width=10,
+            ),
+            # right column for the score card
+            dbc.Col(html.Div(children=[
+                card_pt_system_nocar_body
+            ]), width=2,
+                    style={'textAlign': 'center', 'border': 'none'},
+                    align='center'
+                    ),
+        ]),
+    ], style={'padding': 10, 'flex': 1}),
     html.Br(),
+    html.Br(),
+
+    # next section separator
+    html.Hr(),
+    html.Br(),
+    html.Br(),
+
     # SOCIETY
     html.Div(children=[
         html.H1(children='Society',
@@ -101,15 +122,15 @@ app.layout = html.Div(children=[
         html.H1(children='Results',
                 style={'textAlign': 'center', 'color': colors['light_blue']}
                 ),
-        card_pt_system_results
+        card_pt_system_ptspeed_results
     ]),
     footer,
 ])
 
 
-# CALLBACK FOR TABS OF TRANSPORT SYSTEM INDICATORS
+# CALLBACK FOR TABS OF TRANSPORT SYSTEM INDICATORS - PT SPEED
 @app.callback(
-    Output('tabs-tr-sys-content', 'children'),
+    Output('tabs-ptspeed-content', 'children'),
     Input('tabs-ptspeed', 'value')
 )
 def render_content(tab):
@@ -119,7 +140,7 @@ def render_content(tab):
             html.H2('Method 1'),
             html.Br(),
             dbc.Col([
-                html.Div("Description here",
+                html.Div('Description here',
                          style={
                              'width': '100%',
                              'height': '60px',
@@ -165,7 +186,7 @@ def render_content(tab):
                         dcc.Download(id='download-sample-ptspeed-m1'),
                         html.Button('Download sample dataset', id='btn-download-sample-ptspeed-m1',
                                     style={
-                                        'width': '50%',
+                                        'width': '80%',
                                         'height': '60px',
                                         'lineHeight': '60px',
                                         'borderStyle': 'none',
@@ -257,7 +278,7 @@ def render_content(tab):
             html.H2('Method 2'),
             html.Br(),
             dbc.Col([
-                html.Div("Description here",
+                html.Div('Description here',
                          style={
                              'width': '100%',
                              'height': '60px',
@@ -328,7 +349,7 @@ def render_content(tab):
             html.H2('Method 3'),
             html.Br(),
             dbc.Col([
-                html.Div("Description here",
+                html.Div('Description here',
                          style={
                              'width': '100%',
                              'height': '60px',
@@ -374,7 +395,7 @@ def render_content(tab):
                         dcc.Download(id='download-sample-ptspeed-m3'),
                         html.Button('Download sample dataset', id='btn-download-sample-ptspeed-m3',
                                     style={
-                                        'width': '50%',
+                                        'width': '80%',
                                         'height': '60px',
                                         'lineHeight': '60px',
                                         'borderStyle': 'none',
@@ -816,7 +837,7 @@ def save_pt_sys(n_click, score):
     Output('transport-score-body', 'children'),
     Input('memory-ptspeed', 'data'),
 )
-def update_transport_results(data):
+def update_transport_card_body(data):
     if data is None:
         raise PreventUpdate
 
@@ -828,11 +849,305 @@ def update_transport_results(data):
     Input('memory-ptspeed', 'data'),
     prevent_initial_call=True
 )
-def update_transport_results(data):
+def update_transport_card_results(data):
     if data is None:
         raise PreventUpdate
 
     return data
+
+
+@app.callback(
+    Output('nocar-score-body', 'children'),
+    Input('memory-nocar', 'data'),
+)
+def update_nocar_card_body(data):
+    if data is None:
+        raise PreventUpdate
+
+    return data
+
+
+# CALLBACK FOR TABS OF TRANSPORT SYSTEM INDICATORS
+@app.callback(
+    Output('tabs-nocar-content', 'children'),
+    Input('tabs-nocar', 'value')
+)
+def render_content(tab):
+    if tab == 'tab-1-nocar':
+        return html.Div(children=[
+            html.Br(),
+            html.H2('Local experiment'),
+            html.Br(),
+            dbc.Col([
+                html.Div('Description here',
+                         style={
+                             'width': '100%',
+                             'height': '60px',
+                             'lineHeight': '60px',
+                             'borderStyle': 'solid',
+                             'borderColor': colors['light_blue'],
+                             'textAlign': 'center',
+                             'background-color': 'white',
+                             'borderRadius': '2px',
+                             'borderWidth': '1px',
+                         }
+                         ),
+            ], style={'textAlign': 'center'}),
+            html.Br(),
+            dbc.Row([
+                dbc.Col([
+                    dbc.Row([
+                        dbc.Col(html.Div('Inhabitants',
+                                         style={'margin-top': '10px', 'fontWeight': 'bold'}
+                                         ), width=5),
+                        dbc.Col(
+                            dcc.Input(id='inhab-nocar-loc', type='number', placeholder='Inhabitants', min=1,
+                                      style={'marginRight': '10px', 'margin-top': '10px'}),
+                        )
+                    ]),
+                    dbc.Row([
+                        dbc.Col(html.Div('Public Transport Length [km]',
+                                         style={'margin-top': '10px', 'fontWeight': 'bold'}
+                                         ), width=5),
+                        dbc.Col(
+                            dcc.Input(id='pt-length-nocar-loc', type='number', placeholder='PT Length (km)', min=1,
+                                      style={'marginRight': '10px', 'margin-top': '10px'}),
+                        )
+                    ]),
+                    dbc.Row([
+                        dbc.Col(html.Div('Average days of PT service',
+                                         style={'margin-top': '10px', 'fontWeight': 'bold'}
+                                         ), width=5),
+                        dbc.Col(
+                            dcc.Input(id='pt-day-serv-nocar-loc', type='number', placeholder='PT service days', min=1,
+                                      style={'marginRight': '10px', 'margin-top': '10px'}),
+                        )
+                    ]),
+                    dbc.Row([
+                        dbc.Col(html.Div('Number of PT stops',
+                                         style={'margin-top': '10px', 'fontWeight': 'bold'}
+                                         ), width=5),
+                        dbc.Col(
+                            dcc.Input(id='pt-stops-nocar-loc', type='number', placeholder='PT stops number', min=1,
+                                      style={'marginRight': '10px', 'margin-top': '10px'}),
+                        )
+                    ]),
+                    dbc.Row([
+                        dbc.Col(html.Div('Share of PT cost on income',
+                                         style={'margin-top': '10px', 'fontWeight': 'bold'}
+                                         ), width=5),
+                        dbc.Col(
+                            dcc.Input(id='pt-cost-nocar-loc', type='number', placeholder='Share of PT cost', min=0.1,
+                                      style={'marginRight': '10px', 'margin-top': '10px'}),
+                        )
+                    ]),
+                    dbc.Row([
+                        dbc.Col(html.Div('Beta-1 parameter', style={'margin-top': '10px', 'fontWeight': 'bold'}
+                                         ), width=5),
+                        dbc.Col(
+                            dcc.Input(id='beta-1-nocar-loc', type='number', placeholder='Beta-1 param (optional)',
+                                      style={'marginRight': '10px', 'margin-top': '10px'}),
+                        ),
+                        dbc.Tooltip(children=([
+                            html.Div('Beta 1 parameter is optional. '
+                                     'Default value is 1. It can be used to boost the PT length weight in the formula.',
+                                     style={'color': 'white', 'fontSize': '0.8vw', 'textAlign': 'left'}
+                                     )
+                        ]),
+                            target='beta-1-nocar-loc',
+                        ),
+                    ]),
+                    dbc.Row([
+                        dbc.Col(html.Div('Beta-2 parameter', style={'margin-top': '10px', 'fontWeight': 'bold'}
+                                         ), width=5),
+                        dbc.Col(
+                            dcc.Input(id='beta-2-nocar-loc', type='number', placeholder='Beta-2 param (optional)',
+                                      style={'marginRight': '10px', 'margin-top': '10px'}),
+                        ),
+                        dbc.Tooltip(children=([
+                            html.Div('Beta 2 parameter is optional. '
+                                     'Default value is 1. It can be used to boost the average days of service weight in the formula.',
+                                     style={'color': 'white', 'fontSize': '0.8vw', 'textAlign': 'left'}
+                                     )
+                        ]),
+                            target='beta-2-nocar-loc',
+                        ),
+                    ]),
+                    dbc.Row([
+                        dbc.Col(html.Div('Beta-3 parameter', style={'margin-top': '10px', 'fontWeight': 'bold'}
+                                         ), width=5),
+                        dbc.Col(
+                            dcc.Input(id='beta-3-nocar-loc', type='number', placeholder='Beta-3 param (optional)',
+                                      style={'marginRight': '10px', 'margin-top': '10px'}),
+                        ),
+                        dbc.Tooltip(children=([
+                            html.Div('Beta 3 parameter is optional. '
+                                     'Default value is 0.5. It can be used to boost the number of stops weight in the formula.',
+                                     style={'color': 'white', 'fontSize': '0.8vw', 'textAlign': 'left'}
+                                     )
+                        ]),
+                            target='beta-3-nocar-loc',
+                        ),
+                    ]),
+                    dbc.Row([
+                        dbc.Col(html.Div('Beta-4 parameter', style={'margin-top': '10px', 'fontWeight': 'bold'}
+                                         ), width=5),
+                        dbc.Col(
+                            dcc.Input(id='beta-4-nocar-loc', type='number', placeholder='Beta-4 param (optional)', max=-0.1,
+                                      style={'marginRight': '10px', 'margin-top': '10px'}),
+                        ),
+                        dbc.Tooltip(children=([
+                            html.Div('Beta 4 parameter is optional. '
+                                     'Default value is -1. It can be used to boost the share of PT cost weight in the formula. '
+                                     'Only negative values are allowed.',
+                                     style={'color': 'white', 'fontSize': '0.8vw', 'textAlign': 'left'}
+                                     )
+                        ]),
+                            target='beta-4-nocar-loc',
+                        ),
+                    ]),
+                ]),
+                dbc.Col([
+                    html.H3(id='title_nocar-loc', style={'textAlign': 'center', 'color': colors['light_blue']}),
+                    html.H1(id='nocar-local-output',
+                            style={
+                                'textAlign': 'center',
+                                'fontWeight': 'bold',
+                                'color': colors['green']
+                            }),
+                    dcc.Store(id='memory-nocar'),
+                    dbc.Row([
+                        dbc.Col("", width=4),
+                        dbc.Col([
+                            html.Button('Save', id='btn-save-nocar-local', disabled=True,
+                                        style={
+                                            'width': '100%',
+                                            'height': '60px',
+                                            'lineHeight': '60px',
+                                            'borderStyle': 'none',
+                                            'textAlign': 'center',
+                                            'background-color': 'grey',
+                                            'color': 'white',
+                                            'borderRadius': '10px',
+                                            'fontWeight': 'bold'
+                                        }),
+                        ], width=4),
+                    ], align='center'),
+                ], align='center')
+            ]),
+        ])
+
+    elif tab == 'tab-2-nocar':
+        return html.Div([
+            html.Br(),
+            html.H2('Whole city experiment'),
+            html.Br(),
+            dbc.Col([
+                html.Div('Description here',
+                         style={
+                             'width': '100%',
+                             'height': '60px',
+                             'lineHeight': '60px',
+                             'borderStyle': 'solid',
+                             'borderColor': colors['light_blue'],
+                             'textAlign': 'center',
+                             'background-color': 'white',
+                             'borderRadius': '2px',
+                             'borderWidth': '1px',
+                         }
+                         ),
+            ], style={'textAlign': 'center'}),
+        ])
+
+
+@app.callback(
+    Output('title_nocar-loc', 'children'),
+    Output('nocar-local-output', 'children'),
+    Output('btn-save-nocar-local', 'style'),
+    Output('btn-save-nocar-local', 'disabled'),
+    Input('inhab-nocar-loc', 'value'),
+    Input('pt-length-nocar-loc', 'value'),
+    Input('pt-day-serv-nocar-loc', 'value'),
+    Input('pt-stops-nocar-loc', 'value'),
+    Input('pt-cost-nocar-loc', 'value'),
+    Input('beta-1-nocar-loc', 'value'),
+    Input('beta-2-nocar-loc', 'value'),
+    Input('beta-3-nocar-loc', 'value'),
+    Input('beta-4-nocar-loc', 'value'),
+)
+def compute_output_nocar_local(inhab, pt_len, pt_day_serv, pt_stops, pt_cost, beta1, beta2, beta3, beta4):
+    title = ""
+    score = ""
+    btn_disabled = True
+
+    # enable or not the calculation
+    show_result = False
+    count = 0
+    mandatory_inp = [inhab, pt_len, pt_day_serv, pt_stops, pt_cost]
+    for mi in mandatory_inp:
+        if mi is not None:
+            count += 1
+    if count / len(mandatory_inp) == 1:
+        show_result = True
+
+    # check beta values and assign default is empty
+    if beta1 is None:
+        beta1 = 1
+    if beta2 is None:
+        beta2 = 1
+    if beta3 is None:
+        beta3 = 0.5
+    if beta4 is None:
+        beta4 = -1
+
+    if show_result:
+        title = "Alternatives to car score"
+        score = round(
+            ((pt_len**beta1) * (pt_day_serv**beta2) * (pt_stops**beta3) * (pt_cost**beta4)) / inhab,
+            2)
+        btn_style = {
+            'width': '100%',
+            'height': '60px',
+            'lineHeight': '60px',
+            'borderStyle': 'none',
+            'textAlign': 'center',
+            'background-color': colors['green'],
+            'color': 'white',
+            'borderRadius': '10px',
+            'fontWeight': 'bold'
+        }
+        btn_disabled = False
+    else:
+        btn_style = {
+            'width': '100%',
+            'height': '60px',
+            'lineHeight': '60px',
+            'borderStyle': 'none',
+            'textAlign': 'center',
+            'background-color': 'grey',
+            'color': 'white',
+            'borderRadius': '10px',
+            'fontWeight': 'bold'
+        }
+
+    return title, score, btn_style, btn_disabled
+
+
+@app.callback(
+    Output('memory-nocar', 'data', allow_duplicate=True),
+    Output('btn-save-nocar-local', 'n_clicks'),
+    Input('btn-save-nocar-local', 'n_clicks'),
+    Input('nocar-local-output', 'children'),
+    prevent_initial_call=True
+)
+def save_nocar_loc(n_click, score):
+    if n_click is None:
+        raise PreventUpdate
+    else:
+        n_click_reset = None
+        print(score)
+
+    return score, n_click_reset
 
 
 # Run app
