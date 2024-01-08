@@ -1,14 +1,18 @@
 import base64
-import datetime
 import io
-from dash import Dash, dcc, Output, Input, html, State, dash_table  # pip install dash
-import dash_bootstrap_components as dbc  # pip install dash-bootstrap-components
-import plotly.express as px
+from dash import Dash, Output, Input, State  # pip install dash
+# import plotly.express as px
 import pandas as pd
 from layout_components import *
 from dash.exceptions import PreventUpdate
 
 # https://www.youtube.com/watch?v=WOWVat5BgM4&ab_channel=CharmingData
+
+'''
+PREFIXES FOR CODE SECTIONS
+- PT speed: pt-speed
+- Alternative to car: nocar
+'''
 
 # incorporate data into app
 df = pd.read_csv('https://raw.githubusercontent.com/ChiricoTRT/deploy_test/main/test_data_2.csv')
@@ -32,7 +36,9 @@ app.layout = html.Div(children=[
                 )
     ]),
 
+    # -----------------------------------------
     # TRANSPORT INDICATOR 1: PT SPEED
+    # -----------------------------------------
     html.Div(children=[
         html.H2('Public Transport Speed', style={'textAlign': 'center', 'color': colors['dark_blue']}),
         html.Br(),
@@ -49,7 +55,7 @@ app.layout = html.Div(children=[
                 ]),
             ]), width=10,
             ),
-            # right column for the score card
+            # right column for the scorecard
             dbc.Col(html.Div(children=[
                 card_pt_system_ptspeed_body
             ]), width=2,
@@ -62,7 +68,9 @@ app.layout = html.Div(children=[
     html.Hr(),
     html.Br(),
 
+    # ---------------------------------------------------------------------
     # TRANSPORT INDICATOR 2: ALTERNATIVE TO PRIVATE MEANS OF TRANSPORT
+    # ---------------------------------------------------------------------
     html.Div(children=[
         html.H2('Alternative to private car index', style={'textAlign': 'center', 'color': colors['dark_blue']}),
         html.Br(),
@@ -78,13 +86,13 @@ app.layout = html.Div(children=[
                 ]),
             ]), width=10,
             ),
-            # right column for the score card
+            # right column for the scorecard
             dbc.Col(html.Div(children=[
                 card_pt_system_nocar_body
             ]), width=2,
-                    style={'textAlign': 'center', 'border': 'none'},
-                    align='center'
-                    ),
+                style={'textAlign': 'center', 'border': 'none'},
+                align='center'
+            ),
         ]),
     ], style={'padding': 10, 'flex': 1}),
     html.Br(),
@@ -95,7 +103,9 @@ app.layout = html.Div(children=[
     html.Br(),
     html.Br(),
 
-    # SOCIETY
+    # -------------------------------------------------------------------
+    # --------------------------- SOCIETY -------------------------------
+    # -------------------------------------------------------------------
     html.Div(children=[
         html.H1(children='Society',
                 style={'textAlign': 'center', 'color': colors['light_blue']}
@@ -106,7 +116,10 @@ app.layout = html.Div(children=[
     html.Hr(),
     html.Br(),
     html.Br(),
-    # ECONOMY
+
+    # -------------------------------------------------------------------
+    # ---------------------------- ECONOMY ------------------------------
+    # -------------------------------------------------------------------
     html.Div(children=[
         html.H1(children='Economy',
                 style={'textAlign': 'center', 'color': colors['light_blue']}
@@ -117,7 +130,18 @@ app.layout = html.Div(children=[
     html.Hr(),
     html.Br(),
     html.Br(),
-    # RESULTS
+    #
+    #
+    #
+    #
+    #
+    #
+    #
+    #
+    #
+    # --------------------------------------------------------
+    # ------------------- RESULTS ----------------------------
+    # --------------------------------------------------------
     html.Div(children=[
         html.H1(children='Results',
                 style={'textAlign': 'center', 'color': colors['light_blue']}
@@ -131,7 +155,43 @@ app.layout = html.Div(children=[
 ])
 
 
-# CALLBACK FOR TABS OF TRANSPORT SYSTEM INDICATORS - PT SPEED
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+# -----------------------------------------------------------------------
+# -----------------------------------------------------------------------
+
+# -------------------         CALLBACKS        --------------------------
+
+# -----------------------------------------------------------------------
+# -----------------------------------------------------------------------
+
+# -----------------------------------------------------------------------
+# TRANSPORT
+# -----------------------------------------------------------------------
+
+# --------------------------------------------------------------------
+# ------ PT SPEED - TRANSPORT - CALLBACKS
+# --------------------------------------------------------------------
 @app.callback(
     Output('tabs-ptspeed-content', 'children'),
     Input('tabs-ptspeed', 'value')
@@ -461,6 +521,7 @@ def reset_pt_sys_m2(n_clicks):
               Output('btn-save-ptspeed-m2', 'disabled', allow_duplicate=True),
               Output('btn-save-ptspeed-m2', 'style'),
               Output('measured-time-reset-ptspeed-m2', 'disabled'),
+              Output('measured-time-reset-ptspeed-m2', 'style'),
               Input('ptspeed-m2-out-list', 'children'),
               Input('measured-time-min-ptspeed-m2', 'value'),
               Input('measured-time-sec-ptspeed-m2', 'value'),
@@ -468,9 +529,17 @@ def reset_pt_sys_m2(n_clicks):
               Input('ptspeed-m2-result', 'children'),
               prevent_initial_call=True)
 def add_measured_time(out_value, mins, secs, n_click, result):
+    btn_reset_style = {'width': '10%', 'height': '60px', 'lineHeight': '60px', 'borderStyle': 'none',
+                       'textAlign': 'center', 'background-color': 'grey', 'color': 'white',
+                       'borderRadius': '10px', 'fontWeight': 'bold', 'marginRight': '10px'
+                       }
     reset_btn_disable = True
     if len(out_value) > 0:
         reset_btn_disable = False
+        btn_reset_style = {'width': '10%', 'height': '60px', 'lineHeight': '60px', 'borderStyle': 'none',
+                           'textAlign': 'center', 'background-color': colors['light_blue'], 'color': 'white',
+                           'borderRadius': '10px', 'fontWeight': 'bold', 'marginRight': '10px'
+                           }
 
     btn_disabled = True
     btn_style = {'width': '10%', 'height': '60px', 'lineHeight': '60px', 'borderStyle': 'none',
@@ -494,6 +563,10 @@ def add_measured_time(out_value, mins, secs, n_click, result):
                      'textAlign': 'center', 'background-color': 'grey', 'color': 'white',
                      'borderRadius': '10px', 'fontWeight': 'bold', 'marginRight': '10px'
                      }
+        btn_reset_style = {'width': '10%', 'height': '60px', 'lineHeight': '60px', 'borderStyle': 'none',
+                           'textAlign': 'center', 'background-color': colors['light_blue'], 'color': 'white',
+                           'borderRadius': '10px', 'fontWeight': 'bold', 'marginRight': '10px'
+                           }
         if mins is not None and secs is not None:
             out_value.append(round(mins + secs / 60, 2))
             out_value.append(' | ')
@@ -543,7 +616,7 @@ def add_measured_time(out_value, mins, secs, n_click, result):
         }
 
     return out_value, btn_disabled, btn_style, reset_val_min, reset_val_sec, n_click, result, title, \
-           save_disable, save_style, reset_btn_disable
+           save_disable, save_style, reset_btn_disable, btn_reset_style
 
 
 @app.callback(Output('pt-speed_output-score-file-ptspeed-m1', 'children'),
@@ -557,10 +630,11 @@ def update_output(contents):
 
     content_type, content_string = contents.split(',')
     decoded = base64.b64decode(content_string)
-    df = pd.read_csv(io.StringIO(decoded.decode('utf-8')))
+    df_input = pd.read_csv(io.StringIO(decoded.decode('utf-8')))
 
     pt_speed = round(
-        (df['stop_distance_km'] / df['average_speed_km_h'] * 60 + (df['average_stop_time_min'] * df['numbers_of_stops'])).mean(), 2)
+        (df_input['stop_distance_km'] / df_input['average_speed_km_h'] * 60 +
+         (df_input['average_stop_time_min'] * df_input['numbers_of_stops'])).mean(), 2)
 
     btn_disabled = True
     btn_style = {}
@@ -596,10 +670,11 @@ def update_output(contents):
 
     content_type, content_string = contents.split(',')
     decoded = base64.b64decode(content_string)
-    df = pd.read_csv(io.StringIO(decoded.decode('utf-8')))
+    df_input = pd.read_csv(io.StringIO(decoded.decode('utf-8')))
 
     pt_speed = round(
-        (df['stop_distance_km'] / df['average_speed_km_h'] * 60 + (df['average_stop_time_min'] * df['numbers_of_stops'])).mean(), 2)
+        (df_input['stop_distance_km'] / df_input['average_speed_km_h'] * 60 +
+         (df_input['average_stop_time_min'] * df_input['numbers_of_stops'])).mean(), 2)
 
     btn_disabled = True
     btn_style = {}
@@ -837,10 +912,10 @@ def save_pt_sys(n_click, score):
 
 
 @app.callback(
-    Output('transport-score-body', 'children'),
+    Output('pt-speed-score-body', 'children'),
     Input('memory-ptspeed', 'data'),
 )
-def update_transport_card_body(data):
+def update_pt_speed_card_body(data):
     if data is None:
         raise PreventUpdate
 
@@ -848,16 +923,20 @@ def update_transport_card_body(data):
 
 
 @app.callback(
-    Output('transport-score-results', 'children', allow_duplicate=True),
+    Output('pt-speed-score-results', 'children', allow_duplicate=True),
     Input('memory-ptspeed', 'data'),
     prevent_initial_call=True
 )
-def update_transport_card_results(data):
+def update_pt_speed_card_results(data):
     if data is None:
         raise PreventUpdate
 
     return data
 
+
+# --------------------------------------------------------------------
+# ------ NO CAR - TRANSPORT - CALLBACKS
+# --------------------------------------------------------------------
 
 @app.callback(
     Output('nocar-score-body', 'children'),
@@ -1071,7 +1150,124 @@ def render_content(tab):
                          }
                          ),
             ], style={'textAlign': 'center'}),
-        ])
+            html.Br(),
+            dbc.Row([
+                dbc.Col([
+                    dbc.Row([
+                        dbc.Col(html.Div('Inhabitants',
+                                         style={'margin-top': '10px', 'fontWeight': 'bold'}
+                                         ), width=5),
+                        dbc.Col(
+                            dcc.Input(id='inhab-nocar-whole', type='number', placeholder='Inhabitants', min=1,
+                                      style={'marginRight': '10px', 'margin-top': '10px'}),
+                        )
+                    ]),
+                    dbc.Row([
+                        dbc.Col(html.Div('PT length',
+                                         style={'margin-top': '10px', 'fontWeight': 'bold'}
+                                         ), width=5),
+                        dbc.Col(
+                            dcc.Input(id='pt-length-nocar-whole', type='number', placeholder='PT length', min=1,
+                                      style={'marginRight': '10px', 'margin-top': '10px'}),
+                        )
+                    ]),
+                    dbc.Row([
+                        dbc.Col(html.Div('Average days of PT service',
+                                         style={'margin-top': '10px', 'fontWeight': 'bold'}
+                                         ), width=5),
+                        dbc.Col(
+                            dcc.Input(id='avg-day-serv-nocar-whole', type='number', placeholder='PT service days', min=1,
+                                      style={'marginRight': '10px', 'margin-top': '10px'}),
+                        )
+                    ]),
+                    dbc.Row([
+                        dbc.Col(html.Div('Share of PT cost on income',
+                                         style={'margin-top': '10px', 'fontWeight': 'bold'}
+                                         ), width=5),
+                        dbc.Col(
+                            dcc.Input(id='pt-share-cost-nocar-whole', type='number', placeholder='Share of PT cost', min=1,
+                                      style={'marginRight': '10px', 'margin-top': '10px'}),
+                        )
+                    ]),
+                    dbc.Row([
+                        dbc.Col(html.Div('Beta-1 parameter', style={'margin-top': '10px', 'fontWeight': 'bold'}
+                                         ), width=5),
+                        dbc.Col(
+                            dcc.Input(id='beta-1-nocar-whole', type='number', placeholder='Beta-1 param (optional)',
+                                      style={'marginRight': '10px', 'margin-top': '10px'}),
+                        ),
+                        dbc.Tooltip(children=([
+                            html.Div('Beta 1 parameter is optional. '
+                                     'Default value is 1. It can be used to boost the PT length weight in the formula.',
+                                     style={'color': 'white', 'fontSize': '0.8vw', 'textAlign': 'left'}
+                                     )
+                        ]),
+                            target='beta-1-nocar-whole',
+                        ),
+                    ]),
+                    dbc.Row([
+                        dbc.Col(html.Div('Beta-2 parameter', style={'margin-top': '10px', 'fontWeight': 'bold'}
+                                         ), width=5),
+                        dbc.Col(
+                            dcc.Input(id='beta-2-nocar-whole', type='number', placeholder='Beta-2 param (optional)',
+                                      style={'marginRight': '10px', 'margin-top': '10px'}),
+                        ),
+                        dbc.Tooltip(children=([
+                            html.Div('Beta 2 parameter is optional. '
+                                     'Default value is 1. It can be used to boost the average days of service weight in the formula.',
+                                     style={'color': 'white', 'fontSize': '0.8vw', 'textAlign': 'left'}
+                                     )
+                        ]),
+                            target='beta-2-nocar-whole',
+                        ),
+                    ]),
+                    dbc.Row([
+                        dbc.Col(html.Div('Beta-4 parameter', style={'margin-top': '10px', 'fontWeight': 'bold'}
+                                         ), width=5),
+                        dbc.Col(
+                            dcc.Input(id='beta-4-nocar-whole', type='number', placeholder='Beta-4 param (optional)', max=-0.1,
+                                      style={'marginRight': '10px', 'margin-top': '10px'}),
+                        ),
+                        dbc.Tooltip(children=([
+                            html.Div('Beta 4 parameter is optional. '
+                                     'Default value is -1. It can be used to boost the share of PT cost weight in the formula. '
+                                     'Only negative values are allowed.',
+                                     style={'color': 'white', 'fontSize': '0.8vw', 'textAlign': 'left'}
+                                     )
+                        ]),
+                            target='beta-4-nocar-whole',
+                        ),
+                    ]),
+                ]),
+                dbc.Col([
+                    html.H3(id='title_nocar-whole', style={'textAlign': 'center', 'color': colors['light_blue']}),
+                    html.H1(id='nocar-whole-output',
+                            style={
+                                'textAlign': 'center',
+                                'fontWeight': 'bold',
+                                'color': colors['green']
+                            }),
+                    dcc.Store(id='memory-nocar'),
+                    dbc.Row([
+                        dbc.Col("", width=4),
+                        dbc.Col([
+                            html.Button('Save', id='btn-save-nocar-whole', disabled=True,
+                                        style={
+                                            'width': '100%',
+                                            'height': '60px',
+                                            'lineHeight': '60px',
+                                            'borderStyle': 'none',
+                                            'textAlign': 'center',
+                                            'background-color': 'grey',
+                                            'color': 'white',
+                                            'borderRadius': '10px',
+                                            'fontWeight': 'bold'
+                                        }),
+                        ], width=4),
+                    ], align='center'),
+                ], align='center')
+            ]),
+        ]),
 
 
 @app.callback(
@@ -1117,7 +1313,76 @@ def compute_output_nocar_local(inhab, pt_len, pt_day_serv, pt_stops, pt_cost, be
     if show_result:
         title = "Alternatives to car score"
         score = round(
-            ((pt_len**beta1) * (pt_day_serv**beta2) * (pt_stops**beta3) * (pt_cost**beta4)) / inhab,
+            ((pt_len ** beta1) * (pt_day_serv ** beta2) * (pt_stops ** beta3) * (pt_cost ** beta4)) / inhab,
+            2)
+        btn_style = {
+            'width': '100%',
+            'height': '60px',
+            'lineHeight': '60px',
+            'borderStyle': 'none',
+            'textAlign': 'center',
+            'background-color': colors['green'],
+            'color': 'white',
+            'borderRadius': '10px',
+            'fontWeight': 'bold'
+        }
+        btn_disabled = False
+    else:
+        btn_style = {
+            'width': '100%',
+            'height': '60px',
+            'lineHeight': '60px',
+            'borderStyle': 'none',
+            'textAlign': 'center',
+            'background-color': 'grey',
+            'color': 'white',
+            'borderRadius': '10px',
+            'fontWeight': 'bold'
+        }
+
+    return title, score, btn_style, btn_disabled
+
+
+@app.callback(
+    Output('title_nocar-whole', 'children'),
+    Output('nocar-whole-output', 'children'),
+    Output('btn-save-nocar-whole', 'style'),
+    Output('btn-save-nocar-whole', 'disabled'),
+    Input('inhab-nocar-whole', 'value'),
+    Input('pt-length-nocar-whole', 'value'),
+    Input('avg-day-serv-nocar-whole', 'value'),
+    Input('pt-share-cost-nocar-whole', 'value'),
+    Input('beta-1-nocar-whole', 'value'),
+    Input('beta-2-nocar-whole', 'value'),
+    Input('beta-4-nocar-whole', 'value'),
+)
+def compute_output_nocar_local(inhab, pt_len, pt_day_serv, pt_cost, beta1, beta2, beta4):
+    title = ""
+    score = ""
+    btn_disabled = True
+
+    # enable or not the calculation
+    show_result = False
+    count = 0
+    mandatory_inp = [inhab, pt_len, pt_day_serv, pt_cost]
+    for mi in mandatory_inp:
+        if mi is not None:
+            count += 1
+    if count / len(mandatory_inp) == 1:
+        show_result = True
+
+    # check beta values and assign default is empty
+    if beta1 is None:
+        beta1 = 1
+    if beta2 is None:
+        beta2 = 1
+    if beta4 is None:
+        beta4 = -1
+
+    if show_result:
+        title = "Alternatives to car score"
+        score = round(
+            ((pt_len ** beta1) * (pt_day_serv ** beta2) * (pt_cost ** beta4)) / inhab,
             2)
         btn_style = {
             'width': '100%',
@@ -1159,7 +1424,22 @@ def save_nocar_loc(n_click, score):
         raise PreventUpdate
     else:
         n_click_reset = None
-        print(score)
+
+    return score, n_click_reset
+
+
+@app.callback(
+    Output('memory-nocar', 'data', allow_duplicate=True),
+    Output('btn-save-nocar-whole', 'n_clicks'),
+    Input('btn-save-nocar-whole', 'n_clicks'),
+    Input('nocar-whole-output', 'children'),
+    prevent_initial_call=True
+)
+def save_nocar_loc(n_click, score):
+    if n_click is None:
+        raise PreventUpdate
+    else:
+        n_click_reset = None
 
     return score, n_click_reset
 

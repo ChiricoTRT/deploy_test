@@ -1,5 +1,5 @@
 from dash import html, dcc
-import dash_bootstrap_components as dbc
+import dash_bootstrap_components as dbc     # pip install dash-bootstrap-components
 
 colors = {'light_blue': '#02ACE3',
           'dark_blue': '#0047A0',
@@ -183,11 +183,11 @@ input_5_routes_pt_speed_m1 = html.Div([
 # ------------------------------------ PT SPEED ------------------------------------------
 card_pt_system_ptspeed_body = dbc.Card(
     [
-        dbc.CardImg(src=r'assets/transport.png', top=True),
+        dbc.CardImg(src=r'assets/icon_pt_speed.png', top=True),
         dbc.CardBody(
             [
                 html.H4('Public Transport Speed Score', className='card-title', style={'textAlign': 'center'}),
-                html.H2(id='transport-score-body', style={
+                html.H2(id='pt-speed-score-body', style={
                     'textAlign': 'center',
                     'color': colors['green'],
                 }),
@@ -199,11 +199,11 @@ card_pt_system_ptspeed_body = dbc.Card(
 
 card_pt_system_ptspeed_results = dbc.Card(
     [
-        dbc.CardImg(src=r'assets/transport.png', top=True),
+        dbc.CardImg(src=r'assets/icon_pt_speed.png', top=True),
         dbc.CardBody(
             [
                 html.H4('Public Transport Speed Score', className='card-title', style={'textAlign': 'center'}),
-                html.H2(id='transport-score-results', style={
+                html.H2(id='pt-speed-score-results', style={
                     'textAlign': 'center',
                     'color': colors['green']
                 }),
@@ -216,7 +216,7 @@ card_pt_system_ptspeed_results = dbc.Card(
 # ------------------------------------ NO CAR ------------------------------------------
 card_pt_system_nocar_body = dbc.Card(
     [
-        dbc.CardImg(src=r'assets/transport.png', top=True),
+        dbc.CardImg(src=r'assets/icon_no_car.png', top=True),
         dbc.CardBody(
             [
                 html.H4('Alternative to car Score', className='card-title', style={'textAlign': 'center'}),
@@ -232,7 +232,7 @@ card_pt_system_nocar_body = dbc.Card(
 
 card_pt_system_nocar_results = dbc.Card(
     [
-        dbc.CardImg(src=r'assets/transport.png', top=True),
+        dbc.CardImg(src=r'assets/icon_no_car.png', top=True),
         dbc.CardBody(
             [
                 html.H4('Alternative to car Score', className='card-title', style={'textAlign': 'center'}),
