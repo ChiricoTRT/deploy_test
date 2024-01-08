@@ -15,7 +15,6 @@ PREFIXES FOR CODE SECTIONS
 '''
 
 # incorporate data into app
-df = pd.read_csv('https://raw.githubusercontent.com/ChiricoTRT/deploy_test/main/test_data_2.csv')
 sample_pt_speed = pd.read_csv('https://raw.githubusercontent.com/ChiricoTRT/deploy_test/main/Routes.csv')
 
 # ----------------------------------------------------------------------------------------------------
