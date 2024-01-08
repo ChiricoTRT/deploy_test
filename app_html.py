@@ -122,7 +122,10 @@ app.layout = html.Div(children=[
         html.H1(children='Results',
                 style={'textAlign': 'center', 'color': colors['light_blue']}
                 ),
-        card_pt_system_ptspeed_results
+        dbc.Row([
+            dbc.Col([card_pt_system_ptspeed_results]),
+            dbc.Col([card_pt_system_nocar_results]),
+        ]),
     ]),
     footer,
 ])
@@ -858,6 +861,17 @@ def update_transport_card_results(data):
 
 @app.callback(
     Output('nocar-score-body', 'children'),
+    Input('memory-nocar', 'data'),
+)
+def update_nocar_card_body(data):
+    if data is None:
+        raise PreventUpdate
+
+    return data
+
+
+@app.callback(
+    Output('nocar-score-results', 'children'),
     Input('memory-nocar', 'data'),
 )
 def update_nocar_card_body(data):

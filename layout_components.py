@@ -210,7 +210,7 @@ card_pt_system_ptspeed_results = dbc.Card(
             ]
         ),
     ],
-    style={'width': '18rem', 'borderColor': colors['green']},
+    style={'width': '18rem', 'borderColor': colors['green'], 'marginLeft': '10px'},
 )
 
 # ------------------------------------ NO CAR ------------------------------------------
@@ -228,4 +228,20 @@ card_pt_system_nocar_body = dbc.Card(
         ),
     ],
     style={'width': '18rem', 'borderColor': colors['green']},
+)
+
+card_pt_system_nocar_results = dbc.Card(
+    [
+        dbc.CardImg(src=r'assets/transport.png', top=True),
+        dbc.CardBody(
+            [
+                html.H4('Alternative to car Score', className='card-title', style={'textAlign': 'center'}),
+                html.H2(id='nocar-score-results', style={
+                    'textAlign': 'center',
+                    'color': colors['green'],
+                }),
+            ]
+        ),
+    ],
+    style={'width': '18rem', 'borderColor': colors['green'], 'marginLeft': '10px'},
 )
